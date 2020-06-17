@@ -81,7 +81,7 @@ public:
     // Creature update, without ScriptedAI
     void OnCreatureUpdate(Creature* creature, uint32 diff)
     {
-        return true;
+       // return true;
     }
 
     // AI is used mainly for combat purposes. Passed to the script through GetAI()
@@ -104,7 +104,7 @@ public:
         {
             if (diff > timeToShoot)
             {
-                me->MonsterYell("Pew pew!");
+               // me->MonsterYell("Pew pew!");
                 timeToShoot = 300;
             }
             else

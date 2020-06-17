@@ -1,4 +1,4 @@
-/*
+﻿/*
     MIT License
 
     Copyright (c) 2018 José González
@@ -37,6 +37,12 @@ public:
     {
         player->GetSession()->SendNotification("|CFF7BBEF7[Loot Especial]|r:Item Example was used!");
 
+
+		player->ADD_GOSSIP_ITEM(0, u8"|cff6247c8复活并召唤|h|r全体团员", GOSSIP_SENDER_MAIN, 404);
+		player->ADD_GOSSIP_ITEM(0, u8"为我和全团加满|cff6247c8世界BUFF|h|r", GOSSIP_SENDER_MAIN, 102);
+		player->ADD_GOSSIP_ITEM(0, u8"重新加载服务器个性化配置", GOSSIP_SENDER_MAIN, 999);
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+
         return true;
     }
 
@@ -55,13 +61,24 @@ public:
     // Triggers when the player selects an option from the gossip menu assigned to the item
     void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
     {
-        return true;
+		switch (action)
+		{
+		case 102:
+			player->CastSpell(player, 22888, true);
+			player->CastSpell(player, 16609, true);
+			player->CastSpell(player, 24425, true);
+			break;
+		default:
+			break;
+		}
+		player->CLOSE_GOSSIP_MENU();
+       // return true;
     }
 
     // Same as before, but this time the option has a code assigned
     void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code)
     {
-        return true;
+       // return true;
     }
 };
 

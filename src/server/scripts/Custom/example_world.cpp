@@ -36,10 +36,10 @@ public:
     // Called when the open state is changed
     void OnOpenStateChange(bool open)
     {
-        if (open)
-            sWorld->SendWorldText("The world is now open for connections!");
-        else
-            sWorld->SendWorldText("The world is now closed for connections!");
+       // if (open)
+          //  sWorld->SendWorldText("The world is now open for connections!");
+       // else
+           // sWorld->SendWorldText("The world is now closed for connections!");
     }
 
     // These two methods are called before/after the world config is loaded at startup, or on config reload
@@ -50,7 +50,7 @@ public:
     // Called when the MOTD is changed
     void OnMotdChange(std::string& newMotd)
     {
-        sWorld->SendWorldText("MOTD was changed to: %s", newMotd.c_str());
+        //sWorld->SendWorldText("MOTD was changed to: %s", newMotd.c_str());
     }
 
     // Called when the server is going down
@@ -58,16 +58,16 @@ public:
     // ShutdownMask = RESTART and IDLE
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask)
     {
-        if (code == SHUTDOWN_EXIT_CODE || code == ERROR_EXIT_CODE)
-            sWorld->SendWorldText("The server is going down!");
-        else if (code == RESTART_EXIT_CODE)
-            sWorld->SendWorldText("The server is restarting!");
+       // if (code == SHUTDOWN_EXIT_CODE || code == ERROR_EXIT_CODE)
+           // sWorld->SendWorldText("The server is going down!");
+        //else if (code == RESTART_EXIT_CODE)
+         //   sWorld->SendWorldText("The server is restarting!");
     }
 
     // Called when the shutdown is cancelled
     void OnShutdownCancel()
     {
-        sWorld->SendWorldText("The shutdown was cancelled!");
+       // sWorld->SendWorldText("The shutdown was cancelled!");
     }
 
     // Called in the update cycle, after all other events have been processed
@@ -75,7 +75,7 @@ public:
     {
         if (diff > timeToBark)
         {
-            sWorld->SendWorldText("Wof wof!");
+          //  sWorld->SendWorldText("Wof wof!");
             timeToBark = 3000;
         }
         else
@@ -87,13 +87,13 @@ public:
     // Called after the databases and world config have been loaded, and before the server starts serving
     void OnStartup()
     {
-        sWorld->SendWorldText("Our wonderful server is now running!");
+       // sWorld->SendWorldText("Our wonderful server is now running!");
     }
 
     // Called on shutdown, before kicking all the players and closing the server
     void OnShutdown()
     {
-        sWorld->SendWorldText("See you soon!");
+       // sWorld->SendWorldText("See you soon!");
     }
 
 private:

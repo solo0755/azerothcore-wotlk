@@ -37,15 +37,15 @@ public:
         // Level 2 sub command
         static std::vector<ChatCommand> setCommandTable =
         {
-            { "name",      SEC_GAMEMASTER,    true,   &HandleSetNameCommand,   "" },
-            { "money",     SEC_ADMINISTRATOR, true,   &HandleSetMoneyCommand,  "" }
+          //  { "name",      SEC_GAMEMASTER,    true,   &HandleSetNameCommand,   "" },
+          //  { "money",     SEC_ADMINISTRATOR, true,   &HandleSetMoneyCommand,  "" }
         };
 
         // Level 1 sub command
         static std::vector<ChatCommand> exampleCommandTable =
         {
             // This command does something
-            { "ping",      SEC_MODERATOR,     false,  &HandlePingCommand,      "" },
+         //   { "ping",      SEC_MODERATOR,     false,  &HandlePingCommand,      "" },
 
             // This commands has sub commands
             { "set",       SEC_GAMEMASTER,    true,   nullptr,                 "", setCommandTable },
@@ -69,7 +69,7 @@ public:
     {
         if (!*args)
         {
-            handler->SendSysMessage(LANG_CMD_SYNTAX);
+           // handler->SendSysMessage(LANG_CMD_SYNTAX);
             handler->SetSentErrorMessage(true);
             return false;
         }
