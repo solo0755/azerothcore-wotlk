@@ -23,6 +23,7 @@
  */
 
 #include "ScriptMgr.h"
+#include "PzxConfig.h"
 //#include "ScriptPCH.h"   <- You could use the Precompiled Headers too!
 
 //    item_ + "something"
@@ -35,6 +36,7 @@ public:
     // If you don't want a spell executed, assign the "Dummy Spell" (ID: 18282)
     bool OnUse(Player * player, Item * item, SpellCastTargets const& targets)
     {
+		player->PlayerTalkClass->ClearMenus();
         player->GetSession()->SendNotification("|CFF7BBEF7[Loot Especial]|r:Item Example was used!");
 
 
@@ -67,6 +69,9 @@ public:
 			player->CastSpell(player, 22888, true);
 			player->CastSpell(player, 16609, true);
 			player->CastSpell(player, 24425, true);
+			break;
+		case 999:
+			sPzxConfig->Reload();
 			break;
 		default:
 			break;
