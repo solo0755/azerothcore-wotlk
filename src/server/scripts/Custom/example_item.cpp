@@ -109,7 +109,7 @@ public:
     // Triggers when the player selects an option from the gossip menu assigned to the item
     void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
     {
-		sLog->outString("[pzx](%d)-[%s] action %d", player->GetGUIDLow(), player->GetName(), action);
+		sLog->outString("[pzx](%d)-[%s] action %d", player->GetGUIDLow(), player->GetName().c_str(), action);
 		switch (action)
 		{
 
