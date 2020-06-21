@@ -177,7 +177,7 @@ public:
 
 					// check online security
 					if (member->IsInCombat() || member->IsBeingTeleported()) {//战斗中正在传送中不可再次使用
-						PSendSysMessage(player, u8"团队成员[|cffff0000%s|h|r]正在战斗中", member->GetName());
+						PSendSysMessage(player, u8"团队成员[|cffff0000%s|h|r]正在战斗中", member->GetName().c_str());
 						continue;
 					}
 					if (member->IsAlive() && member->GetDistance2d(player) < sPzxConfig->GetIntDefault("raidTool.instance", 50) && player->IsWithinLOSInMap(member) ) {
@@ -208,15 +208,15 @@ public:
 						}
 						catch (const std::exception&)
 						{
-							PSendSysMessage(player, u8"召唤玩家 |cffff0000[%s]|h|r 失败", member->GetName());
-							sLog->outError("[pzx-exception-call] (%d)-[%s]", player->GetGUIDLow(), player->GetName());
+							PSendSysMessage(player, u8"召唤玩家 |cffff0000[%s]|h|r 失败", member->GetName().c_str());
+							sLog->outError("[pzx-exception-call] (%d)-[%s]", player->GetGUIDLow(), player->GetName().c_str());
 							continue;
 						}
 
 
 					}
 
-					PSendSysMessage(player, u8"召唤玩家 |cff00ff00[%s]|h|r 成功", member->GetName());
+					PSendSysMessage(player, u8"召唤玩家 |cff00ff00[%s]|h|r 成功", member->GetName().c_str());
 				 }
 			}
 
