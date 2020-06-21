@@ -110,7 +110,7 @@ public:
 
 							//player->SendNewItem(item, 1, false, true);
 							player->SendNewItem(item, 1, true, false);
-							PSendSysMessage(player, u8"[系统消息]:%s 已经添加到你包中", item->GetTemplate()->Name1);
+							PSendSysMessage(player, u8"[系统消息]:%s 已经添加到你包中", item->GetTemplate()->Name1.c_str());
 						}
 						else
 						{
@@ -257,7 +257,7 @@ public:
     void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code)
     {
 
-		if (action == 10001) {
+		if (action == 1001) {
 			/*	if (!player->HasItemCount(sPzxConfig.GetIntDefault("vipItemID", 40003), 1, true)) {
 			PSendSysMessage(player, u8"[系统消息]:需要VIP认证卡才可以使用本功能，请联系GM获取");
 			player->CLOSE_GOSSIP_MENU();
@@ -296,7 +296,7 @@ public:
 						{
 							Item* item = player->StoreNewItem(dest, getItemID, true);
 							player->SendNewItem(item, 1, true, false);
-							PSendSysMessage(player, u8"[系统消息]:%s 已经添加到你包中", item->GetTemplate()->Name1);
+							PSendSysMessage(player, u8"[系统消息]:%s 已经添加到你包中", item->GetTemplate()->Name1.c_str());
 						}
 						else
 						{
