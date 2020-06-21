@@ -231,6 +231,7 @@ public:
 			break;
 		case 1002://传送达拉然
 			player->TeleportTo(571, 5797.87f, 798.383f, 661.952f, 4.59022f);
+			break;
 		case 998://新手接待
 				 //player->LearnSpell(33389, false);
 			if (player->getLevel() < 80) {
