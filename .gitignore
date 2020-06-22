@@ -90,3 +90,4 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+!modules/mod-eluna-lua-engine
