@@ -160,6 +160,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->setUInt32(0, TeamId);
     stmt->setUInt32(1, GUID_LOPART(playerGuid));
+	stmt->setUInt32(2, personalRating);
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
