@@ -3429,6 +3429,51 @@ namespace LuaPlayer
         return 0;
     }
     
+	int AddItemByID(lua_State* L, Player* player)//新增接口通过ID获取物品
+	{
+		uint32 itemId = Eluna::CHECKVAL<uint32>(L, 2);
+
+		const ItemTemplate* temp = eObjectMgr->GetItemTemplate(itemId);
+		if (temp) {
+			if (temp->ItemLevel > sPzxConfig->GetIntDefault("GetItemLevel", 251) || temp->Quality > sPzxConfig->GetIntDefault("GetItemQuality", 4))
+			{
+
+				return 1;//获取的物品质量等级过高
+			}
+			std::list<std::string> allForbi = sPzxConfig->GetKeysByString("forbiddenClass");
+			list<std::string>::iterator itor = allForbi.begin();
+			while (itor != allForbi.end())
+			{
+				int forbiddenClassA = sPzxConfig->GetIntDefault((*itor).c_str(), 0);
+				if (temp->Class == forbiddenClassA) {
+					return 1;//这种类型的物品禁止获取
+				}
+				itor++;
+			}
+		}
+		else {
+			return 1;
+		}
+		uint32 itemCount = Eluna::CHECKVAL<uint32>(L, 3, 1);
+		uint32 noSpaceForCount = 0;
+		ItemPosCountVec dest;
+		InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, itemCount, &noSpaceForCount);
+		if (msg != EQUIP_ERR_OK)
+			itemCount -= noSpaceForCount;
+
+		if (itemCount == 0 || dest.empty())
+			return 1;
+
+		Item* item = player->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+		if (item) {
+		
+			player->SendNewItem(item, itemCount, true, false);
+		}
+		Eluna::Push(L, item);
+
+		return 1;
+	}
+
     /**
      * Adds the given amount of the specified item entry to the player.
      *
