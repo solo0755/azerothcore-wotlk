@@ -3429,6 +3429,49 @@ namespace LuaPlayer
         return 0;
     }
     
+
+	int AddItemSet(lua_State* L, Player* player)//新增接口通过ID获取物品
+	{
+		uint32 itemsetid = Eluna::CHECKVAL<uint32>(L, 2);
+
+		if (itemsetid) {
+
+			for (uint32 entryId = 0; entryId < sItemSetStore.GetNumRows(); ++entryId)
+			{
+				ItemSetEntry const* setEntry = sItemSetStore.LookupEntry(itemsetid);
+				if (!setEntry)
+					continue;
+
+				for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
+					if (setEntry->itemId[i]) {
+						if (player->HasItemCount(setEntry->itemId[i], 1, true)) {//已经有一件了
+							continue;
+						}
+						ItemPosCountVec dest;
+						InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, setEntry->itemId[i], 1);
+						if (msg == EQUIP_ERR_OK)
+						{
+							Item* item = player->StoreNewItem(dest, setEntry->itemId[i], true);
+
+							player->SendNewItem(item, 1, true, false);
+							//PSendSysMessage(player, u8"[系统消息]:%s 已经添加到你包中", item->GetTemplate()->Name1.c_str());
+						}
+						else
+						{
+							player->SendEquipError(msg, nullptr, nullptr, setEntry->itemId[i]);
+							//PSendSysMessage(player, u8"[系统消息]:请保持包包有足够空间");
+						}
+						//itemSetItems.insert(setEntry->itemId[i]);
+					}
+			}
+
+		}
+		//Eluna::Push(L, item);
+
+		return 0;
+	}
+
+
 	int AddItemByID(lua_State* L, Player* player)//新增接口通过ID获取物品
 	{
 		uint32 itemId = Eluna::CHECKVAL<uint32>(L, 2);

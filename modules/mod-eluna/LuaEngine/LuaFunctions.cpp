@@ -579,6 +579,8 @@ ElunaRegister<Player> PlayerMethods[] =
     { "Teleport", &LuaPlayer::Teleport },
     { "AddItem", &LuaPlayer::AddItem },
 	{ "AddItemByID", &LuaPlayer::AddItemByID },
+	{ "AddItemSet", &LuaPlayer::AddItemSet },
+		
 #ifndef CLASSIC
     { "IsInArenaTeam", &LuaPlayer::IsInArenaTeam },
 #endif
