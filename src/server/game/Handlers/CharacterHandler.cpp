@@ -2157,7 +2157,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     // xinef: check money
     bool valid = Player::TeamIdForRace(oldRace) == Player::TeamIdForRace(race);
     if ((level < 10 && money <= 0) || (level > 10 && level <= 30 && money <= 3000000 ) || (level > 30 && level <= 50 && money <= 10000000) ||
-        (level > 50 && level <= 70 && money <= 50000000) || (level > 70 && money <= 200000000))
+        (level > 50 && level <= 70 && money <= 50000000) || (level > 70 && money <= 5000000000))//¸ü¸ÄÎª90WAN
         valid = true;
     if (!valid)
     {
