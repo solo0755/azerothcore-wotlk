@@ -1,4 +1,4 @@
-#include "PzxMgr.h"
+ï»¿#include "PzxMgr.h"
 //#include "Policies/SingletonImp.h"
 #include "ace/Thread_Manager.h"
 //#include "ace/OS_NS_time.h"
@@ -32,8 +32,8 @@ public:
 void PzxMgr::thread_start(PzxMgr* arg)
 {
 	MyTimerHandler * timer = new MyTimerHandler(arg);
-	ACE_Time_Value initialDelay(20);  //³õÊ¼ÑÓÊ±Ê±¼ä
-	ACE_Time_Value interval(10);      //¼ä¸ôÊ±¼ä
+	ACE_Time_Value initialDelay(20);  //åˆå§‹å»¶æ—¶æ—¶é—´
+	ACE_Time_Value interval(10);      //é—´éš”æ—¶é—´
 	ACE_Reactor::instance()->schedule_timer(timer,
 		0,
 		initialDelay,
@@ -95,7 +95,7 @@ void PzxMgr::loadAllTimes()
 		uint32 type = fields[1].GetUInt32();
 		uint64 val = fields[2].GetUInt64();
 		uint64 accid = fields[3].GetUInt64();
-		if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//»ñÈ¡ËùÓĞIDµÄÖµ
+		if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//è·å–æ‰€æœ‰IDçš„å€¼
 			acctTypeMap[accid].insert(type);
 		}
 		else {
@@ -104,7 +104,7 @@ void PzxMgr::loadAllTimes()
 			acctTypeMap.insert(std::pair<uint32, std::set<uint32>>(accid, tps));
 		}
 
-		if (tfTimeMap.find(guid) != tfTimeMap.end()) {//ÒÑ¾­´æÔÚ
+		if (tfTimeMap.find(guid) != tfTimeMap.end()) {//å·²ç»å­˜åœ¨
 
 			std::map<uint32, uint64>::iterator got = tfTimeMap[guid].find(type);
 			if (got != tfTimeMap[guid].end()) {
@@ -114,7 +114,7 @@ void PzxMgr::loadAllTimes()
 				tfTimeMap[guid].insert(std::pair<uint32, uint64>(type, val));
 			}
 		}
-		else {//²»´æÔÚ
+		else {//ä¸å­˜åœ¨
 			std::map<uint32, uint64> newVVV;
 			newVVV.insert(std::pair<uint32, uint64>(type, val));
 			tfTimeMap.insert(std::pair<uint32, std::map<uint32, uint64>>(guid, newVVV));
@@ -133,7 +133,7 @@ bool PzxMgr::updateTime(uint32 type, uint32 guid, uint32 accid, uint64 time) {
 	if (!result)
 	{
 		CharacterDatabase.PExecute("insert into _character_extra values ('%u','%u','%u','%u')", guid, type, time, accid);
-		if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//»ñÈ¡ËùÓĞIDµÄÖµ
+		if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//è·å–æ‰€æœ‰IDçš„å€¼
 			acctTypeMap[accid].insert(type);
 		}
 		else {
@@ -141,10 +141,10 @@ bool PzxMgr::updateTime(uint32 type, uint32 guid, uint32 accid, uint64 time) {
 			tps.insert(type);
 			acctTypeMap.insert(std::pair<uint32, std::set<uint32>>(accid, tps));
 		}
-		//tfTimeMap ¶ÔÓ¦Ôö¼ÓÊ±³¤
+		//tfTimeMap å¯¹åº”å¢åŠ æ—¶é•¿
 		std::map<uint32, uint64>::iterator got = tfTimeMap[guid].find(type);
 		if (got != tfTimeMap[guid].end()) {
-			got->second = time;//¸üĞÂÖµ
+			got->second = time;//æ›´æ–°å€¼
 		}
 		else {
 			tfTimeMap[guid].insert(std::pair<uint32, uint64>(type, time));
@@ -154,10 +154,10 @@ bool PzxMgr::updateTime(uint32 type, uint32 guid, uint32 accid, uint64 time) {
 
 
 	}
-	CharacterDatabase.DirectPExecute("update _character_extra set value='%u' ,accid='%u' where guid='%u' and type='%u'", time, accid, guid, type);//¼õÉÙ³É¹¦
+	CharacterDatabase.DirectPExecute("update _character_extra set value='%u' ,accid='%u' where guid='%u' and type='%u'", time, accid, guid, type);//å‡å°‘æˆåŠŸ
 
 	sLog->outString(">> [PZX]system db error 2", time);
-	if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//»ñÈ¡ËùÓĞIDµÄÖµ
+	if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//è·å–æ‰€æœ‰IDçš„å€¼
 		acctTypeMap[accid].insert(type);
 	}
 	else {
@@ -168,7 +168,7 @@ bool PzxMgr::updateTime(uint32 type, uint32 guid, uint32 accid, uint64 time) {
 
 	std::map<uint32, uint64>::iterator got = tfTimeMap[guid].find(type);
 	if (got != tfTimeMap[guid].end()) {
-		got->second = time;//¸üĞÂÖµ
+		got->second = time;//æ›´æ–°å€¼
 	}
 	else {
 		tfTimeMap[guid].insert(std::pair<uint32, uint64>(type, time));
@@ -202,7 +202,7 @@ uint64 PzxMgr::getTimeLength(uint32 guid, uint32 type) {
 	std::map<uint32, std::map<uint32, uint64>> ::iterator it = tfTimeMap.find(guid);
 
 	if (it != tfTimeMap.end()) {
-		//ÅĞ¶ÏË«Ìì¸³ÊÇ·ñ³¬ÆÚĞèÒªÖØĞÂ¿ªÆô
+		//åˆ¤æ–­åŒå¤©èµ‹æ˜¯å¦è¶…æœŸéœ€è¦é‡æ–°å¼€å¯
 		std::map<uint32, uint64> v = it->second;
 		std::map<uint32, uint64>::const_iterator timeIT = v.find(type);
 		if (timeIT != v.end()) {
@@ -216,7 +216,7 @@ uint64 PzxMgr::getTimeLength(uint32 guid, uint32 type) {
 }
 
 bool PzxMgr::getAcctType(uint32 accid, uint32 type) {
-	if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//»ñÈ¡ËùÓĞIDµÄÖµ
+	if (accid > 0 && acctTypeMap.find(accid) != acctTypeMap.end()) {//è·å–æ‰€æœ‰IDçš„å€¼
 		std::set<uint32> itTypes = acctTypeMap[accid];
 		//std::set<uint32> ::iterator iter;
 		return itTypes.find(type) != itTypes.end();
@@ -229,7 +229,7 @@ bool PzxMgr::isTimeOut(uint32 guid, uint32 type) {
 	std::map<uint32, std::map<uint32, uint64>> ::iterator it = tfTimeMap.find(guid);
 
 	if (it != tfTimeMap.end()) {
-		//ÅĞ¶ÏË«Ìì¸³ÊÇ·ñ³¬ÆÚĞèÒªÖØĞÂ¿ªÆô
+		//åˆ¤æ–­åŒå¤©èµ‹æ˜¯å¦è¶…æœŸéœ€è¦é‡æ–°å¼€å¯
 		std::map<uint32, uint64> v = it->second;
 		std::map<uint32, uint64>::const_iterator timeIT = v.find(type);
 		if (timeIT != v.end()) {
@@ -246,12 +246,12 @@ bool PzxMgr::isTimeOut(uint32 guid, uint32 type) {
 bool PzxMgr::addPoints(uint32 cutPoint, uint32 accountID) {
 	LoginDatabase.DirectPExecute("update account set zanzu=zanzu+'%u' where id='%u'", cutPoint, accountID);
 
-	//Ôö¼Ó³É¹¦
+	//å¢åŠ æˆåŠŸ
 
 	AccountPointMap::iterator got = accountPMap.find(accountID);
 	if (got != accountPMap.end()) {
 		uint32 newVel = got->second.val + cutPoint;
-		accountPMap[got->first].val = newVel;//¸üĞÂÖµ
+		accountPMap[got->first].val = newVel;//æ›´æ–°å€¼
 		sLog->outString(u8">> [PZX]1id:%d + %d point", accountID, cutPoint);
 
 	}
@@ -263,7 +263,7 @@ bool PzxMgr::addPoints(uint32 cutPoint, uint32 accountID) {
 	return false;
 }
 bool PzxMgr::cutPoints(int cutPoint, uint32 accountID) {
-	if (cutPoint == 0) {//Ãâ·ÑµÄ
+	if (cutPoint == 0) {//å…è´¹çš„
 		return true;
 	}
 	bool ret = false;
@@ -274,16 +274,16 @@ bool PzxMgr::cutPoints(int cutPoint, uint32 accountID) {
 		LoginDatabase.DirectPExecute("update _account_extra set val=val+'%u' where id='%u'", -cutPoint, accountID);
 	}
 
-	//¼õÉÙ³É¹¦
+	//å‡å°‘æˆåŠŸ
 	AccountPointMap::iterator got = accountPMap.find(accountID);
 	if (got != accountPMap.end()) {
 		uint32 newVel = got->second.val - cutPoint;
-		accountPMap[got->first].val = newVel;//¸üĞÂÖµ
-		sLog->outString(u8">> [PZX]%d ¿Û¼õ %d", accountID, cutPoint);
+		accountPMap[got->first].val = newVel;//æ›´æ–°å€¼
+		sLog->outString(u8">> [PZX]%d æ‰£å‡ %d", accountID, cutPoint);
 		return true;
 	}
 	else {
-		sLog->outString(u8">> [PZX]%d ÏµÍ³Òì³£a %d", accountID, cutPoint);
+		sLog->outString(u8">> [PZX]%d ç³»ç»Ÿå¼‚å¸¸a %d", accountID, cutPoint);
 	}
 
 	return false;
@@ -314,7 +314,7 @@ void PzxMgr::loadAllPonits()
 
 		AccountPointMap::iterator got = accountPMap.find(accountID);
 		if (got != accountPMap.end()) {
-			got->second.val = val;//¸üĞÂÖµ,¶¨Ê±Æ÷×öÍ¬²½
+			got->second.val = val;//æ›´æ–°å€¼,å®šæ—¶å™¨åšåŒæ­¥
 		}
 		else {
 			AccountPoint pt = { accountID, idx, val };
@@ -326,11 +326,11 @@ void PzxMgr::loadAllPonits()
 	} while (result->NextRow());
 
 
-	//Í¬²½»ı·Ö ÕâÀïÖ»ÄÜÓĞÒ»¸ö·şÎñÆ÷×ö
+	//åŒæ­¥ç§¯åˆ† è¿™é‡Œåªèƒ½æœ‰ä¸€ä¸ªæœåŠ¡å™¨åš
 	if (sPzxConfig->GetIntDefault("server.computerPoint", 1)) {
 
 		_AccountPointMap _accountPMap;
-		//²éÑ¯
+		//æŸ¥è¯¢
 		QueryResult result2 = LoginDatabase.PQuery("SELECT id,zanzu FROM account  where zanzu>1");
 		if (!result2)
 		{
@@ -344,7 +344,7 @@ void PzxMgr::loadAllPonits()
 			int32 val = fields[1].GetInt32();
 			_AccountPointMap::iterator got = _accountPMap.find(accountID);
 			if (got != _accountPMap.end()) {
-				got->second = val;//¸üĞÂÖµ,¶¨Ê±Æ÷×öÍ¬²½
+				got->second = val;//æ›´æ–°å€¼,å®šæ—¶å™¨åšåŒæ­¥
 			}
 			else {
 				_accountPMap.insert(std::pair<uint32, int32>(accountID, val));
@@ -356,22 +356,22 @@ void PzxMgr::loadAllPonits()
 			uint32 accID = sysnIt->first;
 			int32 synVal = sysnIt->second - 1;
 			AccountPointMap::iterator got = accountPMap.find(accID);
-			if (got != accountPMap.end()) {//ÒÔÇ°ÓĞÊı¾İ£¬ÇåÀíaccount£¬Ôö¼Ó_account_extra
+			if (got != accountPMap.end()) {//ä»¥å‰æœ‰æ•°æ®ï¼Œæ¸…ç†accountï¼Œå¢åŠ _account_extra
 				sLog->outString(">> Syn Player point ==> accid=%d,point=%d", accID, synVal);
-				//1 ×öupdate
-				LoginDatabase.PExecute("update account set zanzu=1 where id='%u'", accID);//ÇåÁã
-				LoginDatabase.PExecute("update _account_extra set val=val+%u where id='%u'", synVal, accID);//ÇåÁã
+				//1 åšupdate
+				LoginDatabase.PExecute("update account set zanzu=1 where id='%u'", accID);//æ¸…é›¶
+				LoginDatabase.PExecute("update _account_extra set val=val+%u where id='%u'", synVal, accID);//æ¸…é›¶
 
-																											//2¸üĞÂmap
-				got->second.val = got->second.val + synVal;//¸üĞÂÖµ,¶¨Ê±Æ÷×öÍ¬²½
+																											//2æ›´æ–°map
+				got->second.val = got->second.val + synVal;//æ›´æ–°å€¼,å®šæ—¶å™¨åšåŒæ­¥
 			}
-			else {//ÒÔÇ°Ã»³äÖµ¹ı£¬ĞÂÔöÊı¾İ²¢ÇÒÇåÀí
+			else {//ä»¥å‰æ²¡å……å€¼è¿‡ï¼Œæ–°å¢æ•°æ®å¹¶ä¸”æ¸…ç†
 				sLog->outString(">> Create Player point ==> accid=%d,point=%d", accID, synVal);
-				//1 ×ö²åÈëÓï¾ä
-				LoginDatabase.PExecute("INSERT INTO _account_extra (`id`, `idx`, `val`) VALUES('%u','1','%u')", accID, synVal);//Ôö¼Ó
+				//1 åšæ’å…¥è¯­å¥
+				LoginDatabase.PExecute("INSERT INTO _account_extra (`id`, `idx`, `val`) VALUES('%u','1','%u')", accID, synVal);//å¢åŠ 
 				AccountPoint pt = { accID, 1, synVal };
 				accountPMap.insert(std::pair<uint32, AccountPoint>(accID, pt));
-				LoginDatabase.PExecute("update account set zanzu=1 where id='%u'", accID);//ÇåÁã
+				LoginDatabase.PExecute("update account set zanzu=1 where id='%u'", accID);//æ¸…é›¶
 			}
 			sysnIt++;
 		}
@@ -410,8 +410,8 @@ CharaMenuMap PzxMgr::loadAllMenu(uint32 pid)
 		uint32 unioncheck = fields[10].GetUInt32();
 		uint32 popMenu = fields[11].GetUInt32();
 		uint32 iconID = fields[12].GetUInt32();
-		//menu·Ö²ã
-		//1.ÏÈÕÒ³öpidÎª0µÄ²Ëµ¥ÏîÄ¿
+		//menuåˆ†å±‚
+		//1.å…ˆæ‰¾å‡ºpidä¸º0çš„èœå•é¡¹ç›®
 		MenuTree pt = { id, pid, name,unionID,needval,type,raceMask,itemid ,itemNum,telexyz ,unioncheck,popMenu,iconID,loadAllMenu(id) };
 		//sLog->outString("loadAllMenu4");
 		std::pair<uint32, MenuTree> menu(id, pt);

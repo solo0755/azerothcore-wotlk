@@ -1,4 +1,4 @@
-
+ï»¿
 #include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Singleton.h>
 #include "ace/Configuration_Import_Export.h"
@@ -10,23 +10,23 @@ struct MenuTree
 	uint32 id;
 	uint32 pid;
 	std::string name;
-	uint32 unionID;//»¥³â±àºÅ
+	uint32 unionID;//äº’æ–¥ç¼–å·
 	uint32 needval;
-	uint32 type; //²Ëµ¥ÀàĞÍ£º0²Ëµ¥,1¿ª¹Ø½Úµã£¬2¹ºÂòÎïÆ·£¬3Ôö¼ÓÊ±³¤£¬4Ñ§Ï°¼¼ÄÜ,5´«ËÍµØµã
-	uint32 racemask;//ÖÖ×åÑÚÂë
-	uint32 itemid;//ÎïÆ·ID
-	uint32 item_count;//ÎïÆ·ÊıÁ¿
-	std::string   xyz; //×ø±êÎ»ÖÃ
-					   //uint32 spellid; //¼¼ÄÜID
-					   //uint32 timeLength; //Ê±³¤
-	uint32 unioncheck; //»¥³â¿ª¹Ø
-	uint32 popMenu; //ÊÇ·ñÊÇµ¯³ö¿ò
-	uint32 iconID; //ÊÇ·ñÊÇµ¯³ö¿ò
+	uint32 type; //èœå•ç±»å‹ï¼š0èœå•,1å¼€å…³èŠ‚ç‚¹ï¼Œ2è´­ä¹°ç‰©å“ï¼Œ3å¢åŠ æ—¶é•¿ï¼Œ4å­¦ä¹ æŠ€èƒ½,5ä¼ é€åœ°ç‚¹
+	uint32 racemask;//ç§æ—æ©ç 
+	uint32 itemid;//ç‰©å“ID
+	uint32 item_count;//ç‰©å“æ•°é‡
+	std::string   xyz; //åæ ‡ä½ç½®
+					   //uint32 spellid; //æŠ€èƒ½ID
+					   //uint32 timeLength; //æ—¶é•¿
+	uint32 unioncheck; //äº’æ–¥å¼€å…³
+	uint32 popMenu; //æ˜¯å¦æ˜¯å¼¹å‡ºæ¡†
+	uint32 iconID; //æ˜¯å¦æ˜¯å¼¹å‡ºæ¡†
 	std::map<uint32, MenuTree> children;
 
 };
 
-enum GmOnOffOptions //ÄÚ´æ¿ª¹â
+enum GmOnOffOptions //å†…å­˜å¼€å…‰
 {
 	GMOPTIONS_O1 = 0,//
 	GMOPTIONS_O2 = 1, //
