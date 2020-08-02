@@ -26611,19 +26611,16 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 
     trans->Append(stmt);
 
-	//幻化的保存部分
+	//PZX 幻化的保存部分
 	index = 0;
 	PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_HUANHUA);
 	// cache equipment...
 	std::ostringstream ss_copy;
 	ss_copy.str("");
 
-	for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)         //string: item id, ench (perm/temp)
+	for (uint32 i = 0; i < EQUIPMENT_SLOT_END*2; ++i)        
 	{
 		ss_copy << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET) << " ";
-		uint32 ench1 = GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET + 1 + PERM_ENCHANTMENT_SLOT);
-		uint32 ench2 = GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET + 1 + TEMP_ENCHANTMENT_SLOT);
-		ss_copy << uint32(MAKE_PAIR32(ench1, ench2)) << " ";
 	}
 
 	stmt2->setUInt32(index++, GetGUIDLow());
