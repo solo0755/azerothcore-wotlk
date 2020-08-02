@@ -18425,12 +18425,10 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 		int i = 0;
 		for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
 		{
-			if (i % 2 == 0) {
 				uint32 node = uint32(atol(*iter));
 				if (node > 0) {
 					SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET, node);// Ëæ»úÊÍ·Å
 				}
-			}
 			i++;
 		}
 
@@ -26616,7 +26614,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 	std::ostringstream ss_copy;
 	ss_copy.str("");
 
-	for (uint32 i = 0; i < EQUIPMENT_SLOT_END*2; ++i)        
+	for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)        
 	{
 		ss_copy << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET) << " ";
 	}
