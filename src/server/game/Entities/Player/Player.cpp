@@ -18425,8 +18425,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 		int i = 0;
 		for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
 		{
-			if (i > 38)
-				break;
 			if (i % 2 == 0) {
 				uint32 node = uint32(atol(*iter));
 				if (node > 0) {
