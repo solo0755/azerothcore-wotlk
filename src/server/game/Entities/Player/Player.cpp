@@ -18419,8 +18419,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 	do
 	{
 		Field* fields = result_huanh->Fetch();
-
-		const char * huanhua = fields[0].GetString().c_str();
+		std::string huanhua=fields[0].GetString();
 
 		Tokenizer tokens(huanhua, ' ');
 		int i = 0;
@@ -26616,12 +26615,19 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 	index = 0;
 	PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_HUANHUA);
 	// cache equipment...
-	std::ostringstream ss;
-	ss.str("");
-	for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
-		ss << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) << ' ';
+	std::ostringstream ss_copy;
+	ss_copy.str("");
+
+	for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)         //string: item id, ench (perm/temp)
+	{
+		ss_copy << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET) << " ";
+		uint32 ench1 = GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET + 1 + PERM_ENCHANTMENT_SLOT);
+		uint32 ench2 = GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET + 1 + TEMP_ENCHANTMENT_SLOT);
+		ss_copy << uint32(MAKE_PAIR32(ench1, ench2)) << " ";
+	}
+
 	stmt2->setUInt32(index++, GetGUIDLow());
-	stmt2->setString(index++, ss.str());
+	stmt2->setString(index++, ss_copy.str());
 	trans->Append(stmt2);
 }
 
