@@ -77,6 +77,7 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
+#include "Configuration/PzxConfig.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -2913,7 +2914,9 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     // not too far
     if (!creature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return NULL;
-
+	if (creature->GetCreatureTemplate()->Entry == sPzxConfig->GetIntDefault("newnpc.id", 200002)){
+		return creature;
+	}
     // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
     // pussywizard: this function is not used when talking, but when already taking action (buy spell, reset talents, show spell list)
     if (npcflagmask & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS) && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS && getClass() != creature->GetCreatureTemplate()->trainer_class)
@@ -18426,8 +18429,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 		for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
 		{
 				uint32 node = uint32(atol(*iter));
-				if (node > 0) {
-					SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET, node);// Ëæ»úÊÍ·Å
+				if (node >0) {
+					SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET, node);
 				}
 			i++;
 		}
