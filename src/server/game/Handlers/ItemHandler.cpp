@@ -1343,7 +1343,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 			}
 
 		}
-		_player->SaveToDB(true, false);
+		_player->SaveToDB(false, false);
 		//PSendSysMessage(player, u8"您的武器幻化完成");
 		return;
 	}

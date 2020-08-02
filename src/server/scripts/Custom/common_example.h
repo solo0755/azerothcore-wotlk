@@ -17,3 +17,15 @@ const uint32 IDS[13][7] =
 	{ 0,0, 0, 0 , 0, 0,0 },
 	{ 185,513, 205, 214 ,493,479,521 },//CLASS_DRUID
 };
+
+char * const ItemQualityColorsStr[MAX_ITEM_QUALITY] = {
+	"|cff9d9d9d",        // GREY
+	"|cffffffff",        // WHITE
+	"|cff1eff00",        // GREEN
+	"|cff0070dd",        // BLUE
+	"|cffa335ee",        // PURPLE
+	"|cffff8000",        // ORANGE
+	"|cffe6cc80"        // LIGHT YELLOW
+};
+
+

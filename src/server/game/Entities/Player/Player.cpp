@@ -8870,6 +8870,10 @@ void Player::_ApplyAllItemMods()
         }
     }
 
+
+
+
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "_ApplyAllItemMods complete.");
 #endif
@@ -18402,6 +18406,39 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         if (!HasAuraState((AuraStateType)m_spellInfo->CasterAuraState))
             aura->HandleAllEffects(itr->second, AURA_EFFECT_HANDLE_REAL, false);
     }
+	//pzx 最后加载幻化
+	//幻化自定义内容
+	//读取数据库记录
+	QueryResult result_huanh = CharacterDatabase.PQuery("select huanhua from _character_hh where guid='%u'", GetGUIDLow());
+	if (!result_huanh)
+	{
+		sLog->outString(">> Loaded 0 huanhua for %u", GetGUIDLow());
+		return true;
+	}
+
+	do
+	{
+		Field* fields = result_huanh->Fetch();
+
+		const char * huanhua = fields[0].GetString().c_str();
+
+		Tokenizer tokens(huanhua, ' ');
+		int i = 0;
+		for (Tokenizer::const_iterator iter = tokens.begin(); iter != tokens.end(); ++iter)
+		{
+			if (i > 38)
+				break;
+			if (i % 2 == 0) {
+				uint32 node = uint32(atol(*iter));
+				if (node > 0) {
+					SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i * MAX_VISIBLE_ITEM_OFFSET, node);// 随机释放
+				}
+			}
+			i++;
+		}
+
+	} while (result_huanh->NextRow());
+
     return true;
 }
 
@@ -26320,6 +26357,8 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
     PreparedStatement* stmt = NULL;
     uint8 index = 0;
 
+	
+		
     if (create)
     {
         //! Insert query
@@ -26570,7 +26609,20 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setUInt32(index++, GetGUIDLow());
     }
 
+
     trans->Append(stmt);
+
+	//幻化的保存部分
+	index = 0;
+	PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_HUANHUA);
+	// cache equipment...
+	std::ostringstream ss;
+	ss.str("");
+	for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
+		ss << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) << ' ';
+	stmt2->setUInt32(index++, GetGUIDLow());
+	stmt2->setString(index++, ss.str());
+	trans->Append(stmt2);
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)
