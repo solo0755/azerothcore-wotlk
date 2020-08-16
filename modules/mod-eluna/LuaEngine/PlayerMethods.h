@@ -4270,5 +4270,21 @@ namespace LuaPlayer
     player->RemovePet(player->GetPet(), (PetSaveMode)mode, returnreagent);
     return 0;
     }*/
+
+	int levelUpPet(lua_State* L, Player* player)
+	{
+	
+	if (!player->GetPet())
+	return 0;
+
+	if ((player->GetPet())->getPetType() == HUNTER_PET)
+	{
+		player->GetPet()->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr->GetXPForLevel(80) / 4);
+		player->GetPet()->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+		player->GetPet()->GivePetLevel(80);
+	}
+	return 0;
+	}
+
 };
 #endif
