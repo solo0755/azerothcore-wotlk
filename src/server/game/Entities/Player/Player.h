@@ -159,6 +159,13 @@ typedef std::list<SpellModifier*> SpellModList;
 
 typedef std::list<uint64> WhisperListContainer;
 
+struct ReforgeData
+{
+	uint32 increase, decrease;
+	int32 stat_value;
+};
+typedef std::unordered_map<uint32, ReforgeData> ReforgeMapType;
+
 struct SpellCooldown
 {
     uint32 end;
@@ -2667,6 +2674,8 @@ class Player : public Unit, public GridObject<Player>
         SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
         static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+		ReforgeMapType reforgeMap; // reforgeMap[iGUID] = ReforgeData
 
     protected:
         // Gamemaster whisper whitelist
