@@ -423,7 +423,11 @@ public:
 		//uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
 		return OnGossipSelectxx(player, creature, sender, action);
 	}
-
+	// Same as before, but this time the option has a code assigned
+	bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code)
+	{
+		return OnGossipSelectxx(player, creature, sender, action);
+	}
 	enum Menus
 	{
 		MAIN_MENU = 200, // stat_type_max

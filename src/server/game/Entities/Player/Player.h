@@ -159,6 +159,18 @@ typedef std::list<SpellModifier*> SpellModList;
 
 typedef std::list<uint64> WhisperListContainer;
 
+struct ItemUpData
+{
+	Item * oitem;
+	uint32 toid;
+	uint32*  reqItem;
+	uint32*  reqItemCount;
+	int8 basePct;
+	int8 luckadd;
+	int8 crazyStatus;
+};
+
+
 struct ReforgeData
 {
 	uint32 increase, decrease;
@@ -2531,6 +2543,8 @@ class Player : public Unit, public GridObject<Player>
         // Set map to player and add reference
         void SetMap(Map* map) override;
         void ResetMap() override;
+		bool doVipItemUP();
+		void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIPÉý¼¶ÎïÆ·»º´æ
 
         bool isAllowedToLoot(const Creature* creature);
 
@@ -2676,7 +2690,7 @@ class Player : public Unit, public GridObject<Player>
         static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
 
 		ReforgeMapType reforgeMap; // reforgeMap[iGUID] = ReforgeData
-
+		ItemUpData m_itemUpData;
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -7968,7 +7968,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (only_level_scale && !ssv)
         return;
 
-	//��Ʒ����
+	//物品重铸
 	uint32 statcount = proto->StatsCount;
 	ReforgeData* reforgeData = NULL;
 	bool decreased = false;
@@ -18439,9 +18439,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         if (!HasAuraState((AuraStateType)m_spellInfo->CasterAuraState))
             aura->HandleAllEffects(itr->second, AURA_EFFECT_HANDLE_REAL, false);
     }
-	//pzx �����ػû�
-	//�û��Զ�������
-	//��ȡ���ݿ��¼
+	//pzx 最后加载幻化
+	//幻化自定义内容
+	//读取数据库记录
 	QueryResult result_huanh = CharacterDatabase.PQuery("select huanhua from _character_hh where guid='%u'", GetGUIDLow());
 	if (!result_huanh)
 	{
@@ -26640,7 +26640,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 
     trans->Append(stmt);
 
-	//PZX �û��ı��沿��
+	//PZX 幻化的保存部分
 	index = 0;
 	PreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_HUANHUA);
 	// cache equipment...
@@ -27722,7 +27722,49 @@ uint32 Player::GetSpec(int8 spec)
     }
     return mostTalentTabId;
 }
+	bool Player::doVipItemUP() {
+	if (m_itemUpData.oitem>0&& m_itemUpData.toid>0) {//简单检查条件
+		//开始合成
+		//1.检查必需品
+		std::unordered_map<uint32, uint8> destroyItemMap;
+		for (uint8 i = 0; i < 5; ++i) {
+			uint32 reqItem = m_itemUpData.reqItem[i];
+			uint32 reqItemCount = m_itemUpData.reqItemCount[i];
 
+			if (reqItem > 0 && reqItemCount > 0) {
+				if (GetItemCount(reqItem) < reqItemCount) {
+
+				return false;
+				}
+				else {
+					destroyItemMap[reqItem] = reqItemCount;
+					//uint8& count = destroyItemMap[reqItem];
+					//count = reqItemCount;
+				}
+			}
+		}
+		uint32 randPrc = urand(1, 100);
+		if ((m_itemUpData.basePct + m_itemUpData.luckadd) >= 100|| (m_itemUpData.basePct + m_itemUpData.luckadd)>randPrc) {
+
+			for (std::unordered_map<uint32, uint8>::const_iterator it = destroyItemMap.begin(); it != destroyItemMap.end();)
+			{
+				   std::unordered_map<uint32, uint8>::const_iterator old_it = it++;
+				   DestroyItemCount(old_it->first, old_it->second, true);
+			}
+			Item * toDestroy = m_itemUpData.oitem;
+			uint32 i_count = 1;
+			DestroyItemCount(toDestroy, i_count, true);
+			AddItem(m_itemUpData.toid, 1);
+
+		}
+		else {
+			GetSession()->SendNotification(u8"这个物品强化失败,请再次尝试");
+		}
+		// m_itemUpData结构体清空
+	}
+	return true;
+
+}
 bool Player::HasTankSpec()
 {
     switch (GetSpec())

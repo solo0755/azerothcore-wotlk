@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "PzxConfig.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -1314,38 +1315,144 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     }
 
 
-	if (gift->GetEntry() == 21831) {//»Ã»¯ÎïÆ·Çø¼ä  Ó²±àÂë
+	if (gift->GetEntry() == sPzxConfig->GetIntDefault("huanhua.id", 21831)) {//å¹»åŒ–ç‰©å“åŒºé—´  ç¡¬ç¼–ç 
 		uint32 _itemID = item->GetEntry();
 		uint8 eSolt = _player->FindEquipSlot(item->GetTemplate(), NULL_SLOT, true);
 		if (eSolt == EQUIPMENT_SLOT_MAINHAND || eSolt == EQUIPMENT_SLOT_OFFHAND) {
 
 			if (_player->IsTwoHandUsed()) {
-				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_MAINHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// ¸½Ä§Ë«ÊÖ
+				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_MAINHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// é™„é­”åŒæ‰‹
 			}
 			else {
 				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
 					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_MAINHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);
 				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_OFFHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
+					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_OFFHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// éšæœºé‡Šæ”¾
 				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && _player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) {
-					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
+					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// éšæœºé‡Šæ”¾
 				}
 				if (!_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) {
-					return;//Á½Ö»ÊÖ¶¼Ã»ÎäÆ÷£¬Ö±½Ó·µ»Ø
+					return;//ä¸¤åªæ‰‹éƒ½æ²¡æ­¦å™¨ï¼Œç›´æ¥è¿”å›
 				}
 			}
 		}
 		else {
 			//uint32 equpSlot = item->GetProto()->InventoryType;
 			if (eSolt != NULL_SLOT) {
-				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
+				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// éšæœºé‡Šæ”¾
 
 			}
 
 		}
 		_player->SaveToDB(false, false);
-		//PSendSysMessage(player, u8"ÄúµÄÎäÆ÷»Ã»¯Íê³É");
+		//PSendSysMessage(player, u8"æ‚¨çš„æ­¦å™¨å¹»åŒ–å®Œæˆ");
 		return;
+	}
+	else if (gift->GetEntry() == sPzxConfig->GetIntDefault("itemup.id", 17308)) {//ç‰©å“å‡çº§ï¼Œç¡¬ç¼–ç ï¼Œ
+		
+		std::string prefix = sPzxConfig->GetStringDefault("itemup.prefix", "uptonext");
+		std::string message = sPzxConfig->GetStringDefault("itemup.message", "ShowUPFrame");
+		uint8 channel = sPzxConfig->GetIntDefault("itemup.channel", 4);
+		uint32 _itemID = item->GetEntry();
+		ItemUpData itemUpdata;
+		itemUpdata.oitem = item;
+
+		std::ostringstream oss;
+		//"ShowUPFrame#32838|1|51395|182|6780|184|0|0|1|2|3|0|0|2|1|3|0|0|0|0|88|æœ±è‰³æ¢…|10|1"
+		oss << message << "#"<< _itemID<<"|";
+		//                                                  0   1    2     3    4                                    8             9                                                        13            14           15        16               17               18               
+		QueryResult result = WorldDatabase.PQuery("select  vip,oid,amount,toId,reqItem1,reqItem2,reqItem3,reqItem4,reqItem5,reqItemCount1,reqItemCount2,reqItemCount3,reqItemCount4,reqItemCount5,reqCurrency1,reqCurrency2,reqCurrencyCount1,reqCurrencyCount2,luckyStoneItem ,crazy from _item_levelup where oid=%u", _itemID);
+		if (result)
+		{
+				oss << (*result)[2].GetUInt32() << "|";
+				oss << (*result)[3].GetUInt32() << "|";
+				//å‡çº§æ‰€éœ€ç‰©å“ID
+				uint32 item1 = (*result)[4].GetUInt32();
+				uint32 item2 = (*result)[5].GetUInt32();
+				uint32 item3 = (*result)[6].GetUInt32();
+				uint32 item4 = (*result)[7].GetUInt32();
+				uint32 item5 = (*result)[8].GetUInt32();
+				oss << item1 << "|";
+				oss << item2 << "|";
+				oss << item3 << "|";
+				oss << item4 << "|";
+				oss << item5 << "|";
+				uint32 items[5] = { item1, item2, item3, item4, item5 };
+				itemUpdata.reqItem = items;
+				//å‡çº§æ‰€éœ€æ•°é‡
+				uint32 itemc1 = (*result)[9].GetUInt32();
+				uint32 itemc2 = (*result)[10].GetUInt32();
+				uint32 itemc3 = (*result)[11].GetUInt32();
+				uint32 itemc4 = (*result)[12].GetUInt32();
+				uint32 itemc5 = (*result)[13].GetUInt32();
+
+				oss << itemc1 << "|";
+				oss << itemc2 << "|";
+				oss << itemc3 << "|";
+				oss << itemc4 << "|";
+				oss << itemc5 << "|";
+
+				uint32 itemsCount[5] = { itemc1, itemc2, itemc3, itemc4, itemc5 };
+				itemUpdata.reqItemCount = itemsCount;
+				//ç°æœ‰æ•°é‡
+				oss << _player->GetItemCount((*result)[4].GetUInt32(),false) << "|";
+				oss << _player->GetItemCount((*result)[5].GetUInt32(), false) << "|";
+				oss << _player->GetItemCount((*result)[6].GetUInt32(), false) << "|";
+				oss << _player->GetItemCount((*result)[7].GetUInt32(), false) << "|";
+				oss << _player->GetItemCount((*result)[8].GetUInt32(), false) << "|";
+				//æ‰€éœ€è´§å¸ç§ç±»åç§°ï¼ˆæš‚æ—¶ä¸ç”¨ï¼‰
+				//oss << (*result)[14].GetUInt32() << "|";
+				//oss << (*result)[15].GetUInt32() << "|";
+				//éœ€è¦è´§å¸æ•°é‡ï¼Œæš‚æ—¶ä¸åˆ†ç§ç±»
+				oss << (*result)[16].GetUInt32() << "|";
+				oss << (*result)[17].GetUInt32() << "|";
+				//æ ¹æ®ä¼šå‘˜ç­‰çº§è®¡ç®—å‡ºåŸºç¡€æ¦‚ç‡
+				uint32 basePrc = (*result)[0].GetUInt32()*sPzxConfig->GetIntDefault("itemup.vipPrc", 5);
+				oss << basePrc << "|";
+				itemUpdata.basePct = basePrc;
+				//å¹¸è¿çŸ³ç§ç±»åç§°
+				const ItemTemplate * itemt = sObjectMgr->GetItemTemplate((*result)[18].GetUInt32());
+				if (itemt) {
+					//åæœŸè¦æ¢æµ®ç‚¹æ•°
+					uint32 max_prc = _player->GetItemCount((*result)[18].GetUInt32(), false)*sPzxConfig->GetIntDefault("itemup.luckStonPrc", 2);
+					itemUpdata.luckadd = max_prc;
+					oss << itemt->Name1<< "|";//é€šè¿‡æ¢ç®—å…¬å¼è·å–
+					oss << max_prc << "|";
+				}
+				else {
+					oss << sPzxConfig->GetStringDefault("itemup.luckstonName", "å¹¸è¿é’»") << "|0|";//é€šè¿‡æ¢ç®—å…¬å¼è·å–
+				}
+				oss << (*result)[19].GetUInt32() ;//æ˜¯å¦ä¸€å®šå‡ ç‡ç¢è£‚
+
+				//å‘é€æ¶ˆæ¯åˆ°å®¢æˆ·ç«¯
+				std::string fullmsg = prefix + "\t" + oss.str();
+				WorldPacket data(SMSG_MESSAGECHAT, 100);
+				data << uint8(channel);
+				data << int32(LANG_ADDON);
+				data << uint64(_player->GetGUID());
+#ifndef CLASSIC
+				data << uint32(0);
+				data << uint64(_player->GetGUID());
+#endif
+				data << uint32(fullmsg.length() + 1);
+				data << fullmsg;
+				data << uint8(0);
+#ifdef CMANGOS
+				_player->GetSession()->SendPacket(data);
+#else
+				_player->GetSession()->SendPacket(&data);
+#endif
+				_player->setVipItemUPInfo(itemUpdata);
+				//è¿˜è¦åœ¨playerå¯¹è±¡ä¸­ç”Ÿæˆä¸€ä¸ªä¸´æ—¶å˜é‡
+
+		}
+		else {
+			//è¯¥ç‰©å“ä¸èƒ½å¼ºåŒ–
+			_player->GetSession()->SendNotification(u8"è¿™ä¸ªç‰©å“ä¸èƒ½è¢«å¼ºåŒ–");
+
+		}
+		//_player->DestroyItemCount(gift, 1, true);
+		return;//ç¡¬ç¼–ç åä¸å¯ä»¥åŒ…è£…äº†
 	}
 
     if (item->IsEquipped())
@@ -1384,39 +1491,6 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         _player->SendEquipError(EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED, item, NULL);
         return;
     }
-	if (gift->GetEntry() == 21831) {//»Ã»¯ÎïÆ·Çø¼ä  Ó²±àÂë
-		uint32 _itemID = item->GetEntry();
-		uint8 eSolt = _player->FindEquipSlot(item->GetTemplate(), NULL_SLOT, true);
-		if (eSolt == EQUIPMENT_SLOT_MAINHAND || eSolt == EQUIPMENT_SLOT_OFFHAND) {
-
-			if (_player->IsTwoHandUsed()) {
-				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_MAINHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// ¸½Ä§Ë«ÊÖ
-			}
-			else {
-				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_MAINHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);
-				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + EQUIPMENT_SLOT_OFFHAND * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
-				if (_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && _player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) {
-					_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
-				}
-				if (!_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND) && !_player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)) {
-					return;//Á½Ö»ÊÖ¶¼Ã»ÎäÆ÷£¬Ö±½Ó·µ»Ø
-				}
-			}
-		}
-		else {
-			//uint32 equpSlot = item->GetProto()->InventoryType;
-			if (eSolt != NULL_SLOT) {
-				_player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + eSolt * MAX_VISIBLE_ITEM_OFFSET, _itemID);// Ëæ»úÊÍ·Å
-
-			}
-
-		}
-		_player->SaveToDB(true, false);
-		//PSendSysMessage(player, u8"ÄúµÄÎäÆ÷»Ã»¯Íê³É");
-		return;
-	}
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -1435,8 +1509,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         case 5048:  item->SetEntry(5044); break;
         case 17303: item->SetEntry(17302); break;
         case 17304: item->SetEntry(17305); break;
-        case 17307: item->SetEntry(17308); break;
-       // case 21830: item->SetEntry(21831); break;  Õâ¸öµÀ¾ıÓÃÔÚ»Ã»¯±¦ÏäÉÏÃæÁË
+       // case 17307: item->SetEntry(17308); break; è¿™ä¸ªé“å…·è¢«ç‰©å“å‡çº§å¾ç”¨äº†
+       // case 21830: item->SetEntry(21831); break;  è¿™ä¸ªé“å›ç”¨åœ¨å¹»åŒ–å®ç®±ä¸Šé¢äº†
     }
 
 
