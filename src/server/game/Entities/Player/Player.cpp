@@ -27722,7 +27722,8 @@ uint32 Player::GetSpec(int8 spec)
     }
     return mostTalentTabId;
 }
-	int Player::doVipItemUP() {
+
+int Player::doVipItemUP() {
 	if (m_itemUpData.oitem&& m_itemUpData.toid>0) {//简单检查条件
 		//开始合成
 		//1.检查必需品
@@ -27745,25 +27746,58 @@ uint32 Player::GetSpec(int8 spec)
 				}
 			}
 		}
+		//合成目标物品是唯一物品，不可合成
+		const ItemTemplate * toItem = sObjectMgr->GetItemTemplate(m_itemUpData.toid);
+		if (!toItem) {
+			return 6;//目标物品不存在
+		}
+		// no maximum
+		if ((toItem->MaxCount <= 0 && toItem->ItemLimitCategory == 0) || toItem->MaxCount == 2147483647) {
+
+		}else if (toItem->MaxCount > 0)		{
+			uint32 curcount = GetItemCount(toItem->ItemId, true);
+			if (curcount + 1 > uint32(toItem->MaxCount))
+			{
+
+				return 5;//超过最大拥有数量
+			}
+		}
+
+
+
 		uint32 randPrc = urand(1, 100);
 		if ((m_itemUpData.basePct + m_itemUpData.luckadd) >= 100|| (m_itemUpData.basePct + m_itemUpData.luckadd)>randPrc) {
 
 			for (std::unordered_map<uint32, uint8>::const_iterator it = destroyItemMap.begin(); it != destroyItemMap.end();)
 			{
 				   std::unordered_map<uint32, uint8>::const_iterator old_it = it++;
+				   sLog->outString(u8"VIP:ITEMUP:摧毁物品(%d)数量%d", old_it->first, old_it->second);
 				   DestroyItemCount(old_it->first, old_it->second, true);
 			}
 			Item * toDestroy = m_itemUpData.oitem;
 			uint32 i_count = 1;
-			DestroyItemCount(toDestroy, i_count, true);
-			AddItem(m_itemUpData.toid, 1);
+			sLog->outString(u8"VIP:ITEMUP:摧毁原始物品(%d)数量%d", toDestroy->GetEntry(), i_count);
+			DestroyItemCount(toDestroy, i_count, true);//销毁需求项目
+			sLog->outString(u8"VIP:ITEMUP:升级得到物品(%d)数量%d", m_itemUpData.toid, 1);
+			AddItem(m_itemUpData.toid, 1);//增加合成品
 			return 999;
 		}
 		else {
+			for (std::unordered_map<uint32, uint8>::const_iterator it = destroyItemMap.begin(); it != destroyItemMap.end();)
+			{
+				std::unordered_map<uint32, uint8>::const_iterator old_it = it++;
+				uint32 todes = urand(1, old_it->second);//随机损失
+				sLog->outString(u8"VIP:ITEMUP:升级失败、随机摧毁物品(%d)数量%d", old_it->first, todes);
+				DestroyItemCount(old_it->first, todes, true);
+
+			}
+
 			return 2;//失败
 			//GetSession()->SendNotification(u8"这个物品强化失败,请再次尝试");
 		}
-		// m_itemUpData结构体清空
+		//清空结构体
+		m_itemUpData.toid = 0;
+		m_itemUpData.oitem = nullptr;
 	}
 	return 1;
 
