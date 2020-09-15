@@ -1374,13 +1374,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 				uint32 item3 = (*result)[6].GetUInt32();
 				uint32 item4 = (*result)[7].GetUInt32();
 				uint32 item5 = (*result)[8].GetUInt32();
-				oss << item1 << "|";
-				oss << item2 << "|";
-				oss << item3 << "|";
-				oss << item4 << "|";
-				oss << item5 << "|";
-				uint32 items[5] = { item1, item2, item3, item4, item5 };
-				itemUpdata.reqItem = items;
+
 				//升级所需数量
 				uint32 itemc1 = (*result)[9].GetUInt32();
 				uint32 itemc2 = (*result)[10].GetUInt32();
@@ -1388,14 +1382,21 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 				uint32 itemc4 = (*result)[12].GetUInt32();
 				uint32 itemc5 = (*result)[13].GetUInt32();
 
-				oss << itemc1 << "|";
-				oss << itemc2 << "|";
-				oss << itemc3 << "|";
-				oss << itemc4 << "|";
-				oss << itemc5 << "|";
-
+				uint32 items[5] = { item1, item2, item3, item4, item5 };
 				uint32 itemsCount[5] = { itemc1, itemc2, itemc3, itemc4, itemc5 };
-				itemUpdata.reqItemCount = itemsCount;
+				for (uint8 i = 0; i < 5; ++i) {
+					itemUpdata.reqItem[i] = items[i];
+
+					if (items[i] > 0 && itemsCount[i] > 0) {
+						itemUpdata.reqItem[i] = items[i];
+						itemUpdata.reqItemCount[i] = itemsCount[i];
+						oss << items[i] << "|" << itemsCount[i] << "|";
+					}
+					else {
+						oss << "0|0|";
+					}
+				}
+
 				//现有数量
 				oss << _player->GetItemCount((*result)[4].GetUInt32(),false) << "|";
 				oss << _player->GetItemCount((*result)[5].GetUInt32(), false) << "|";

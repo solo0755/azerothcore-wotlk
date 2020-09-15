@@ -161,10 +161,15 @@ typedef std::list<uint64> WhisperListContainer;
 
 struct ItemUpData
 {
+	ItemUpData() {
+		for (uint8 i = 0; i < 5; ++i) {
+			reqItem[i] = 0; reqItemCount[i] = 0;
+		}
+	}
 	Item * oitem;
 	uint32 toid;
-	uint32*  reqItem;
-	uint32*  reqItemCount;
+	uint32  reqItem[5];
+	uint32  reqItemCount[5];
 	int8 basePct;
 	int8 luckadd;
 	int8 crazyStatus;

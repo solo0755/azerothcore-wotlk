@@ -27729,10 +27729,8 @@ int Player::doVipItemUP() {
 		//1.检查必需品
 		std::unordered_map<uint32, uint8> destroyItemMap;
 		for (uint8 i = 0; i < 5; ++i) {
-			uint32 * reqitems = m_itemUpData.reqItem;
-			uint32 * reqItemCounts = m_itemUpData.reqItemCount;
-			uint32 reqItem = *(reqitems + i);
-			uint32 reqItemCount = *(reqItemCounts + i);
+			uint32 reqItem = m_itemUpData.reqItem[i];
+			uint32 reqItemCount = m_itemUpData.reqItemCount[i];
 
 			if (reqItem > 0 && reqItemCount > 0) {
 				if (GetItemCount(reqItem) < reqItemCount) {
