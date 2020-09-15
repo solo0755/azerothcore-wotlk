@@ -27723,7 +27723,7 @@ uint32 Player::GetSpec(int8 spec)
     return mostTalentTabId;
 }
 	bool Player::doVipItemUP() {
-	if (m_itemUpData.oitem>0&& m_itemUpData.toid>0) {//简单检查条件
+	if (m_itemUpData.oitem&& m_itemUpData.toid>0) {//简单检查条件
 		//开始合成
 		//1.检查必需品
 		std::unordered_map<uint32, uint8> destroyItemMap;
