@@ -1365,7 +1365,9 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 		if (result)
 		{
 				oss << (*result)[2].GetUInt32() << "|";
-				oss << (*result)[3].GetUInt32() << "|";
+				uint32 toItem = (*result)[3].GetUInt32();
+				oss << toItem << "|";
+				itemUpdata.toid = toItem;
 				//升级所需物品ID
 				uint32 item1 = (*result)[4].GetUInt32();
 				uint32 item2 = (*result)[5].GetUInt32();
@@ -1422,7 +1424,9 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 				else {
 					oss << sPzxConfig->GetStringDefault("itemup.luckstonName", "幸运钻") << "|0|";//通过换算公式获取
 				}
-				oss << (*result)[19].GetUInt32() ;//是否一定几率碎裂
+				uint8 crazyStatus = (*result)[19].GetUInt32();
+				itemUpdata.crazyStatus = crazyStatus;
+				oss << crazyStatus;//是否一定几率碎裂
 
 				//发送消息到客户端
 				std::string fullmsg = prefix + "\t" + oss.str();
