@@ -298,7 +298,7 @@ bool OnGossipSelectxx(Player* player, Creature* creature, uint32 sender, uint32 
 		if (player->GetItemByGuid(sender))
 		{
 			if (!player->reforgeMap.empty() && player->reforgeMap.find(sender) != player->reforgeMap.end())
-				RemoveReforge(player, sender, true);
+			//	RemoveReforge(player, sender, true);
 		}
 		OnGossipHelloxxx(player, creature);
 	}
