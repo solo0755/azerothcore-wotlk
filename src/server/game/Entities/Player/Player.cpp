@@ -27722,7 +27722,7 @@ uint32 Player::GetSpec(int8 spec)
     }
     return mostTalentTabId;
 }
-	bool Player::doVipItemUP() {
+	int Player::doVipItemUP() {
 	if (m_itemUpData.oitem&& m_itemUpData.toid>0) {//简单检查条件
 		//开始合成
 		//1.检查必需品
@@ -27734,7 +27734,7 @@ uint32 Player::GetSpec(int8 spec)
 			if (reqItem > 0 && reqItemCount > 0) {
 				if (GetItemCount(reqItem) < reqItemCount) {
 
-				return false;
+				return 1;//物品不够
 				}
 				else {
 					destroyItemMap[reqItem] = reqItemCount;
@@ -27755,14 +27755,14 @@ uint32 Player::GetSpec(int8 spec)
 			uint32 i_count = 1;
 			DestroyItemCount(toDestroy, i_count, true);
 			AddItem(m_itemUpData.toid, 1);
-
+			return 999;
 		}
 		else {
-			GetSession()->SendNotification(u8"这个物品强化失败,请再次尝试");
+			return 2;//失败
+			//GetSession()->SendNotification(u8"这个物品强化失败,请再次尝试");
 		}
 		// m_itemUpData结构体清空
 	}
-	return true;
 
 }
 bool Player::HasTankSpec()

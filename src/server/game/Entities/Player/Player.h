@@ -2543,7 +2543,7 @@ class Player : public Unit, public GridObject<Player>
         // Set map to player and add reference
         void SetMap(Map* map) override;
         void ResetMap() override;
-		bool doVipItemUP();
+		int doVipItemUP();
 		void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIPÉý¼¶ÎïÆ·»º´æ
 
         bool isAllowedToLoot(const Creature* creature);
