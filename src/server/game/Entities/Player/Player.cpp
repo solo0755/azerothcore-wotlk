@@ -27728,13 +27728,15 @@ uint32 Player::GetSpec(int8 spec)
 		//1.检查必需品
 		std::unordered_map<uint32, uint8> destroyItemMap;
 		for (uint8 i = 0; i < 5; ++i) {
-			uint32 reqItem = m_itemUpData.reqItem[i];
-			uint32 reqItemCount = m_itemUpData.reqItemCount[i];
+			uint32 * reqitems = m_itemUpData.reqItem;
+			uint32 * reqItemCounts = m_itemUpData.reqItemCount;
+			uint32 reqItem = *(reqitems + i);
+			uint32 reqItemCount = *(reqItemCounts + i);
 
 			if (reqItem > 0 && reqItemCount > 0) {
 				if (GetItemCount(reqItem) < reqItemCount) {
 
-				return 3;//物品不够
+					return 3;//物品数量不够
 				}
 				else {
 					destroyItemMap[reqItem] = reqItemCount;
