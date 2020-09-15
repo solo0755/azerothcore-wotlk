@@ -444,6 +444,8 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetGuildId", &LuaPlayer::GetGuildId },
     { "GetCoinage", &LuaPlayer::GetCoinage },
     { "GetTeam", &LuaPlayer::GetTeam },
+	{ "doVipItemUP", &LuaPlayer::doVipItemUP },//VIPºÏ³É±¦Ê¯
+	
     { "GetItemCount", &LuaPlayer::GetItemCount },
     { "GetGroup", &LuaPlayer::GetGroup },
     { "GetGuild", &LuaPlayer::GetGuild },
