@@ -27734,7 +27734,7 @@ uint32 Player::GetSpec(int8 spec)
 			if (reqItem > 0 && reqItemCount > 0) {
 				if (GetItemCount(reqItem) < reqItemCount) {
 
-				return 1;//物品不够
+				return 3;//物品不够
 				}
 				else {
 					destroyItemMap[reqItem] = reqItemCount;
@@ -27763,6 +27763,7 @@ uint32 Player::GetSpec(int8 spec)
 		}
 		// m_itemUpData结构体清空
 	}
+	return 1;
 
 }
 bool Player::HasTankSpec()

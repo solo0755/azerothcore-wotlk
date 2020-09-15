@@ -1467,6 +1467,11 @@ namespace LuaPlayer
         Eluna::Push(L, player->GetTeamId());
         return 1;
     }
+
+	int doItemUP(lua_State* L, Player* player) {//物品合成eluna脚本
+		Eluna::Push(L, player->doVipItemUP());
+		return 1;
+	}
     
     /**
      * Returns amount of the specified [Item] the [Player] has.
@@ -4284,11 +4289,6 @@ namespace LuaPlayer
 		player->GetPet()->GivePetLevel(80);
 	}
 	return 0;
-	}
-
-	int doVipItemUp(lua_State* L, Player* player) {//物品合成eluna脚本
-		Eluna::Push(L, player->doVipItemUP());
-		return 0;
 	}
 
 };
