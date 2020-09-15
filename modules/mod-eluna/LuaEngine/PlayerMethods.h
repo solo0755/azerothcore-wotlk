@@ -4285,11 +4285,7 @@ namespace LuaPlayer
 	}
 	return 0;
 	}
-	int GetTeam(lua_State* L, Player* player)
-	{
-		
-		return 1;
-	}
+
 	int doVipItemUp(lua_State* L, Player* player) {//物品合成eluna脚本
 		Eluna::Push(L, player->doVipItemUP());
 	}
