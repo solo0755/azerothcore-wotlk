@@ -4288,6 +4288,7 @@ namespace LuaPlayer
 
 	int doVipItemUp(lua_State* L, Player* player) {//物品合成eluna脚本
 		Eluna::Push(L, player->doVipItemUP());
+		return 0;
 	}
 
 };
