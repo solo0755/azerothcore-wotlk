@@ -444,7 +444,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GetGuildId", &LuaPlayer::GetGuildId },
     { "GetCoinage", &LuaPlayer::GetCoinage },
     { "GetTeam", &LuaPlayer::GetTeam },
-	{ "doItemUP", &LuaPlayer::doItemUP },//VIP�ϳɱ�ʯ
+	{ "doItemUP", &LuaPlayer::doItemUP },//VIP合成宝石
 	
     { "GetItemCount", &LuaPlayer::GetItemCount },
     { "GetGroup", &LuaPlayer::GetGroup },
@@ -746,6 +746,7 @@ ElunaRegister<Player> PlayerMethods[] =
     { "GroupCreate", &LuaPlayer::GroupCreate },
     { "SendCinematicStart", &LuaPlayer::SendCinematicStart },
 	{ "levelUpPet", &LuaPlayer::levelUpPet },
+    { "createCusInstance", &LuaPlayer::createCusInstance },
 #if !defined(CLASSIC) && !defined(TBC)
     { "SendMovieStart", &LuaPlayer::SendMovieStart },
 #endif

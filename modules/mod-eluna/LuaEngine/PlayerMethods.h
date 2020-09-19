@@ -1468,7 +1468,7 @@ namespace LuaPlayer
         return 1;
     }
 
-	int doItemUP(lua_State* L, Player* player) {//ÎïÆ·ºÏ³Éeluna½Å±¾
+	int doItemUP(lua_State* L, Player* player) {//ç‰©å“åˆæˆelunaè„šæœ¬
 		Eluna::Push(L, player->doVipItemUP());
 		return 1;
 	}
@@ -3304,7 +3304,7 @@ namespace LuaPlayer
 	int learnMaxSkill(lua_State* L, Player* player)
 	{
 		uint32 skillId = Eluna::CHECKVAL<uint32>(L, 2);
-		//Ö±½ÓĞÂÔö·½·¨by pzx  ¸ù¾İ¼¼ÄÜID
+		//ç›´æ¥æ–°å¢æ–¹æ³•by pzx  æ ¹æ®æŠ€èƒ½ID
 		uint32 classmask = player->getClassMask();
 
 		for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
@@ -3435,7 +3435,7 @@ namespace LuaPlayer
     }
     
 
-	int AddItemSet(lua_State* L, Player* player)//ĞÂÔö½Ó¿ÚÍ¨¹ıID»ñÈ¡ÎïÆ·
+	int AddItemSet(lua_State* L, Player* player)//æ–°å¢æ¥å£é€šè¿‡IDè·å–ç‰©å“
 	{
 		uint32 itemsetid = Eluna::CHECKVAL<uint32>(L, 2);
 
@@ -3449,7 +3449,7 @@ namespace LuaPlayer
 
 				for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
 					if (setEntry->itemId[i]) {
-						if (player->HasItemCount(setEntry->itemId[i], 1, true)) {//ÒÑ¾­ÓĞÒ»¼şÁË
+						if (player->HasItemCount(setEntry->itemId[i], 1, true)) {//å·²ç»æœ‰ä¸€ä»¶äº†
 							continue;
 						}
 						ItemPosCountVec dest;
@@ -3459,12 +3459,12 @@ namespace LuaPlayer
 							Item* item = player->StoreNewItem(dest, setEntry->itemId[i], true);
 
 							player->SendNewItem(item, 1, true, false);
-							//PSendSysMessage(player, u8"[ÏµÍ³ÏûÏ¢]:%s ÒÑ¾­Ìí¼Óµ½Äã°üÖĞ", item->GetTemplate()->Name1.c_str());
+							//PSendSysMessage(player, u8"[ç³»ç»Ÿæ¶ˆæ¯]:%s å·²ç»æ·»åŠ åˆ°ä½ åŒ…ä¸­", item->GetTemplate()->Name1.c_str());
 						}
 						else
 						{
 							player->SendEquipError(msg, nullptr, nullptr, setEntry->itemId[i]);
-							//PSendSysMessage(player, u8"[ÏµÍ³ÏûÏ¢]:Çë±£³Ö°ü°üÓĞ×ã¹»¿Õ¼ä");
+							//PSendSysMessage(player, u8"[ç³»ç»Ÿæ¶ˆæ¯]:è¯·ä¿æŒåŒ…åŒ…æœ‰è¶³å¤Ÿç©ºé—´");
 						}
 						//itemSetItems.insert(setEntry->itemId[i]);
 					}
@@ -3477,7 +3477,7 @@ namespace LuaPlayer
 	}
 
 
-	int AddItemByID(lua_State* L, Player* player)//ĞÂÔö½Ó¿ÚÍ¨¹ıID»ñÈ¡ÎïÆ·
+	int AddItemByID(lua_State* L, Player* player)//æ–°å¢æ¥å£é€šè¿‡IDè·å–ç‰©å“
 	{
 		uint32 itemId = Eluna::CHECKVAL<uint32>(L, 2);
 
@@ -3486,7 +3486,7 @@ namespace LuaPlayer
 			if (temp->ItemLevel > sPzxConfig->GetIntDefault("GetItemLevel", 251) || temp->Quality > sPzxConfig->GetIntDefault("GetItemQuality", 4))
 			{
 
-				return 1;//»ñÈ¡µÄÎïÆ·ÖÊÁ¿µÈ¼¶¹ı¸ß
+				return 1;//è·å–çš„ç‰©å“è´¨é‡ç­‰çº§è¿‡é«˜
 			}
 			std::list<std::string> allForbi = sPzxConfig->GetKeysByString("forbiddenClass");
 			list<std::string>::iterator itor = allForbi.begin();
@@ -3494,7 +3494,7 @@ namespace LuaPlayer
 			{
 				int forbiddenClassA = sPzxConfig->GetIntDefault((*itor).c_str(), 0);
 				if (temp->Class == forbiddenClassA) {
-					return 1;//ÕâÖÖÀàĞÍµÄÎïÆ·½ûÖ¹»ñÈ¡
+					return 1;//è¿™ç§ç±»å‹çš„ç‰©å“ç¦æ­¢è·å–
 				}
 				itor++;
 			}
@@ -4290,6 +4290,57 @@ namespace LuaPlayer
 	}
 	return 0;
 	}
+
+
+    int createCusInstance(lua_State* L, Player* player)
+    {
+        if (player->GetGroup()) {
+            Eluna::Push(L, -1);
+            return 1;
+        }
+        Map* map=player->GetMap();
+        if (!map) {
+            Eluna::Push(L, -2);
+            return 1;
+        }
+        if (map->IsBattlegroundOrArena()||map->IsDungeon()) {
+            Eluna::Push(L, -3);
+            return 1;
+        }
+        uint32 mapid = Eluna::CHECKVAL<uint32>(L, 2);
+        std::string data = Eluna::CHECKVAL<std::string>(L, 3);
+        uint32 diffc = Eluna::CHECKVAL<uint32>(L, 4);
+        //uint32 newInstanceId = sMapMgr->GenerateInstanceId();
+        Map* instancMap = sMapMgr->CreateMap(mapid, player);
+            //InstanceScript* iscript = imap->CreateInstanceScript(true, data, false);
+           // 
+        if (instancMap) {
+            InstanceMap* instanM= instancMap->ToInstanceMap();
+            uint32 newInstanceId = instanM->GetInstanceId();
+           InstanceScript* iscript = instanM->GetInstanceScript();
+            if (iscript) {
+                iscript->Load(data.c_str());
+                iscript->SaveToDB();
+                InstanceSave* inSave =sInstanceSaveMgr->GetInstanceSave(newInstanceId);
+               //InstanceSave* inSave= sInstanceSaveMgr->AddInstanceSave(mapid, newInstanceId, Difficulty(diffc),true);
+                inSave->SetInstanceData(data.c_str());
+                inSave->InsertToDB();
+               sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), inSave, true, player);
+              // sInstanceSaveMgr->LoadInstanceSaves();
+              // sInstanceSaveMgr->LoadCharacterBinds();
+               Eluna::Push(L, newInstanceId);
+            }
+        }
+        else {
+            Eluna::Push(L, -4);
+        }
+       
+        return 1;
+
+
+    }
+
+    
 
 };
 #endif
