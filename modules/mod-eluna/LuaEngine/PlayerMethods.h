@@ -4,6 +4,8 @@
 * Please see the included DOCS/LICENSE.md for more information
 */
 
+#include <regex>
+
 #ifndef PLAYERMETHODS_H
 #define PLAYERMETHODS_H
 
@@ -4307,33 +4309,64 @@ namespace LuaPlayer
             Eluna::Push(L, -3);
             return 1;
         }
+        //TODO 判断地图是否为地下城
+
         uint32 mapid = Eluna::CHECKVAL<uint32>(L, 2);
         std::string data = Eluna::CHECKVAL<std::string>(L, 3);
         uint32 diffc = Eluna::CHECKVAL<uint32>(L, 4);
-        //uint32 newInstanceId = sMapMgr->GenerateInstanceId();
-        Map* instancMap = sMapMgr->CreateMap(mapid, player);
-            //InstanceScript* iscript = imap->CreateInstanceScript(true, data, false);
-           // 
-        if (instancMap) {
-            InstanceMap* instanM= instancMap->ToInstanceMap();
-            uint32 newInstanceId = instanM->GetInstanceId();
+        std::string creatureString = Eluna::CHECKVAL<std::string>(L, 4);
+        std::string gobjectString = Eluna::CHECKVAL<std::string>(L, 5);
+        regex re{","};
+        vector<string> creatureVector;
+        vector<string> gobjectVector;
+        uint32 newInstanceId =sMapMgr->GenerateInstanceId();
+        try
+        {
+            creatureVector = vector<string>{sregex_token_iterator(creatureString.begin(), creatureString.end(), re, -1),sregex_token_iterator()};
+            gobjectVector = vector<string>{ sregex_token_iterator(gobjectString.begin(), gobjectString.end(), re, -1),sregex_token_iterator() };
+            time_t respawnTime = time(nullptr) + 60 * 48 * MINUTE;//2天后再刷新，一般公会不会连续开荒2天
+            //构造sql语句
+            for (int i = 0; i < creatureVector.size(); ++i) {
+                int dbGuid = stoi(creatureVector[i]);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CREATURE_RESPAWN);
+                stmt->setUInt32(0, dbGuid);
+                stmt->setUInt32(1, uint32(respawnTime));
+                stmt->setUInt16(2, mapid);
+                stmt->setUInt32(3, newInstanceId);
+                CharacterDatabase.Execute(stmt);
+            }
+            for (int i = 0; i < gobjectVector.size(); ++i) {
+                int dbGuid = stoi(gobjectVector[i]);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GO_RESPAWN);
+                stmt->setUInt32(0, dbGuid);
+                stmt->setUInt32(1, uint32(respawnTime));
+                stmt->setUInt16(2, mapid);
+                stmt->setUInt32(3, newInstanceId);
+                CharacterDatabase.Execute(stmt);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            cout << "error:" << e.what() << std::endl;
+            Eluna::Push(L, -5);//要删除的生物或者GO错误
+            return 1;
+        }
+        InstanceSave* inSave = sInstanceSaveMgr->AddInstanceSave(mapid, newInstanceId, Difficulty(diffc), false);
+        inSave->SetInstanceData(data.c_str());
+        inSave->InsertToDB();//这个时候根据新instance的ID的地图还没创建，应该可以插入数据库....重点
+        sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), inSave, true, player);
+    /*        InstanceMap* instanM= instancMap->ToInstanceMap();
            InstanceScript* iscript = instanM->GetInstanceScript();
             if (iscript) {
                 iscript->Load(data.c_str());
                 iscript->SaveToDB();
                 InstanceSave* inSave =sInstanceSaveMgr->GetInstanceSave(newInstanceId);
-               //InstanceSave* inSave= sInstanceSaveMgr->AddInstanceSave(mapid, newInstanceId, Difficulty(diffc),true);
                 inSave->SetInstanceData(data.c_str());
                 inSave->InsertToDB();
                sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), inSave, true, player);
-              // sInstanceSaveMgr->LoadInstanceSaves();
-              // sInstanceSaveMgr->LoadCharacterBinds();
                Eluna::Push(L, newInstanceId);
-            }
-        }
-        else {
-            Eluna::Push(L, -4);
-        }
+            }*/
+            Eluna::Push(L, newInstanceId);
        
         return 1;
 
