@@ -171,49 +171,6 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
 
     return map;
 }
-//自定义副本数据
-InstanceMap* MapInstanced::CreateCustomInstance(uint32 InstanceId, std::string instanData, Difficulty difficulty)
-{
-    // load/create a map
-    ACORE_GUARD(ACE_Thread_Mutex, Lock);
-
-    // make sure we have a valid map id
-    const MapEntry* entry = sMapStore.LookupEntry(GetId());
-    if (!entry)
-    {
-        sLog->outError("CreateInstance: no entry for map %d", GetId());
-        ABORT();
-    }
-    const InstanceTemplate* iTemplate = sObjectMgr->GetInstanceTemplate(GetId());
-    if (!iTemplate)
-    {
-        sLog->outError("CreateInstance: no instance template for map %d", GetId());
-        ABORT();
-    }
-
-    // some instances only have one difficulty
-    GetDownscaledMapDifficultyData(GetId(), difficulty);
-
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_MAPS, "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save ? "" : "new ", InstanceId, GetId(), difficulty ? "heroic" : "normal");
-#endif
-
-    InstanceMap* map = new InstanceMap(GetId(), InstanceId, difficulty, this);
-    ASSERT(map->IsDungeon());
-
-    map->LoadRespawnTimes();
-
-  /*  if (save)
-        map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());
-    else*/
-        map->CreateInstanceScript(false, instanData, 0);
-
-   // if (!save) // this is for sure a dungeon (assert above), no need to check here
-        sInstanceSaveMgr->AddInstanceSave(GetId(), InstanceId, difficulty);
-
-    m_InstancedMaps[InstanceId] = map;
-    return map;
-}
 
 InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
 { 

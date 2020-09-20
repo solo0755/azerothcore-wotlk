@@ -40,7 +40,6 @@ class MapInstanced : public Map
 
     private:
         InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
-        InstanceMap* CreateCustomInstance(uint32 InstanceId, std::string saveData, Difficulty difficulty);
         BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
         InstancedMaps m_InstancedMaps;
