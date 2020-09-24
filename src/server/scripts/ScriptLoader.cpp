@@ -215,7 +215,6 @@ void AddSC_ghostlands();
 void AddSC_hinterlands();
 void AddSC_ironforge();
 void AddSC_isle_of_queldanas();
-void AddSC_loch_modan();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
@@ -475,6 +474,7 @@ void AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
 void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+void AddSC_boss_pandemonius();
 void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_instance_sethekk_halls();
@@ -807,7 +807,6 @@ void AddEasternKingdomsScripts()
     AddSC_hinterlands();
     AddSC_ironforge();
     AddSC_isle_of_queldanas();
-    AddSC_loch_modan();
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
@@ -912,6 +911,7 @@ void AddOutlandScripts()
     AddSC_instance_auchenai_crypts();
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+    AddSC_boss_pandemonius();
     AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();
