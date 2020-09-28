@@ -43,6 +43,7 @@ class ChatHandler
     public:
         WorldSession* GetSession() { return m_session; }
         explicit ChatHandler(WorldSession* session) : m_session(session), sentErrorMessage(false) {}
+        //explicit ChatHandler(Player* player) : m_session(player->GetSession()), sentErrorMessage(false) {}//wqcore
         virtual ~ChatHandler() { }
 
         // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders

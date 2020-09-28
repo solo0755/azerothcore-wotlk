@@ -270,6 +270,7 @@ class WorldSession
 
         void SendTrainerList(uint64 guid);
         void SendTrainerList(uint64 guid, std::string const& strTitle);
+        void SendTrainerList(uint64 guid, uint32 npcid);
         void SendListInventory(uint64 guid);
         void SendShowBank(uint64 guid);
         bool CanOpenMailBox(uint64 guid);
