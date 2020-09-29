@@ -7,6 +7,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Custom/example_world.cpp
   ${AC_SCRIPTS_DIR}/Custom/PzxMgr.cpp
   ${AC_SCRIPTS_DIR}/Custom/PzxMgr.h
+  ${AC_SCRIPTS_DIR}/Custom/syntheisTrainerNpc.cpp
 )
 
 AC_ADD_SCRIPT_LOADER("Custom" "ScriptLoader.h")
