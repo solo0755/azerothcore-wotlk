@@ -275,7 +275,7 @@ class WorldSession
         void SendTrainerList(uint64 guid, std::string const& strTitle);
         void SendTrainerList(uint64 guid, uint32 npcid);
 
-        void SendListInventory(uint64 guid);
+        //void SendListInventory(uint64 guid);
         void SendListInventory(uint64 guid, uint32 vendorEntry = 0);
 
         void SendShowBank(uint64 guid);
