@@ -18,7 +18,7 @@ function dbasm_mysqlExec() {
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
-
+		echo "pzx user  passwd is : $MYSQL_USER  $MYSQL_PASS"
 	export MYSQL_PWD=$MYSQL_PASS
 
 	retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command")
