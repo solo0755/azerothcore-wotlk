@@ -27,7 +27,10 @@
 #include "Config.h"
 #include "PzxMgr.h"
 #include "Pet.h"
+#include "Chat.h"
+#include "Player.h"
 #include "common_example.h"
+#include "ScriptedGossip.h"
 #include  "Log.h"
 #include <regex>
 
@@ -154,7 +157,7 @@ public:
 			return false;
 		}
 		if (sPzxMgr->cutPoints(needval, accID)) {
-			PSendSysMessage(player, u8"[系统消息]:系统扣减[|cffff0000%d|h|r]后剩余[|cff00ff00%d|h|r]赞助点", needval, sPzxMgr->getMyPoint(accID));
+			PSendSysMessage(player, u8"[系统消息]:系统扣减[|cffff0000%d|h|r]后剩余[|cff00ff00%d|h|r]赞助点.", needval, sPzxMgr->getMyPoint(accID));
 			return player->TeleportTo(mapid, x, y, z, 0.0f);
 		}
 		else

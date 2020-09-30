@@ -2548,8 +2548,18 @@ class Player : public Unit, public GridObject<Player>
         // Set map to player and add reference
         void SetMap(Map* map) override;
         void ResetMap() override;
+        /*********************************************************/
+        /***                   PZX SYSTEM                    ***/
+        /*********************************************************/
+        uint32 m_trainerid;
+        void SetTrainerEntry(const uint32 id) { m_trainerid = id; }
+        uint32 GetTrainerEntry()const { return m_trainerid; }
 		int doVipItemUP();
-		void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIPÉı¼¶ÎïÆ·»º´æ
+		void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIPå‡çº§ç‰©å“ç¼“å­˜
+        /*********************************************************/
+        /***                   PZX SYSTEM    end              ***/
+        /*********************************************************/
+
 
         bool isAllowedToLoot(const Creature* creature);
 

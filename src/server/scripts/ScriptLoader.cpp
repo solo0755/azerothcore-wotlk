@@ -74,6 +74,7 @@ void AddSC_guards();
 void AddSC_item_scripts();
 void AddSC_REFORGER_NPC();
 void AddSC_item_example();
+void AddSC_synthesis_Trainer();
 void AddSC_npc_professions();
 void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
@@ -654,7 +655,6 @@ void AddWorldScripts()
     AddSC_go_scripts();
     AddSC_guards();
     AddSC_item_scripts();
-	AddSC_item_example();
 	AddSC_REFORGER_NPC();
     AddSC_npc_professions();
     AddSC_npc_innkeeper();
@@ -1200,6 +1200,8 @@ void AddOutdoorPvPScripts()
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
+    AddSC_item_example();
+    AddSC_synthesis_Trainer();
 	//~ AddSC_MySuperScript();
 #endif
 }

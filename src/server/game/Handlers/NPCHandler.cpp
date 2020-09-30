@@ -241,6 +241,100 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     SendPacket(&data);
 }
 
+void WorldSession::SendTrainerList(uint64 guid, uint32 npcid)
+{
+    GetPlayer()->SetTrainerEntry(npcid);
+    // remove fake death
+    if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+        GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+
+
+    TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(npcid);
+    if (!trainer_spells)
+    {
+        return;
+    }
+    std::string strTitle = "";
+    WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
+    data << guid;
+    data << uint32(trainer_spells->trainerType);
+
+    size_t count_pos = data.wpos();
+    data << uint32(trainer_spells->spellList.size());
+
+    bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
+
+    uint32 count = 0;
+    for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
+    {
+        TrainerSpell const* tSpell = &itr->second;
+
+        bool valid = true;
+        bool primary_prof_first_rank = false;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!tSpell->learnedSpell[i])
+                continue;
+            if (!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
+            {
+                valid = false;
+                break;
+            }
+            SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(tSpell->learnedSpell[i]);
+            if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank())
+                primary_prof_first_rank = true;
+        }
+        if (!valid)
+            continue;
+
+        TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+
+        data << uint32(tSpell->spell);
+        data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
+        data << uint32(floor(tSpell->spellCost));
+
+        data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
+        data << uint32(primary_prof_first_rank ? 1 : 0);
+        data << uint8(tSpell->reqLevel);
+        data << uint32(tSpell->reqSkill);
+        data << uint32(tSpell->reqSkillValue);
+
+        uint8 maxReq = 0;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!tSpell->learnedSpell[i])
+                continue;
+            if (uint32 prevSpellId = sSpellMgr->GetPrevSpellInChain(tSpell->learnedSpell[i]))
+            {
+                data << uint32(prevSpellId);
+                ++maxReq;
+            }
+            if (maxReq == 3)
+                break;
+            SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(tSpell->learnedSpell[i]);
+            for (SpellsRequiringSpellMap::const_iterator itr2 = spellsRequired.first; itr2 != spellsRequired.second && maxReq < 3; ++itr2)
+            {
+                data << uint32(itr2->second);
+                ++maxReq;
+            }
+            if (maxReq == 3)
+                break;
+        }
+        while (maxReq < 3)
+        {
+            data << uint32(0);
+            ++maxReq;
+        }
+
+        ++count;
+    }
+
+    data << strTitle;
+
+    data.put<uint32>(count_pos, count);
+    SendPacket(&data);
+}
+
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recvData)
 {
     uint64 guid;
@@ -257,49 +351,97 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuySpellOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
 #endif
-        return;
+        if (GetPlayer()->GetTrainerEntry())
+        {
+            // remove fake death
+            if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+                GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+
+            // check present spell in trainer spell list
+            TrainerSpellData const* trainer_spells = sObjectMgr->GetNpcTrainerSpells(GetPlayer()->GetTrainerEntry());
+            if (!trainer_spells)
+                return;
+
+            // not found, cheat?
+            TrainerSpell const* trainer_spell = trainer_spells->Find(spellId);
+            if (!trainer_spell)
+                return;
+
+            // can't be learn, cheat? Or double learn with lags...
+            if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
+                return;
+
+            // apply reputation discount
+            uint32 nSpellCost = uint32(floor(trainer_spell->spellCost));
+
+            // check money requirement
+            if (!_player->HasEnoughMoney(nSpellCost))
+                return;
+
+            _player->ModifyMoney(-int32(nSpellCost));
+
+            _player->SendPlaySpellVisual(179); // 53 SpellCastDirected
+            _player->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
+
+            // learn explicitly or cast explicitly
+            if (trainer_spell->IsCastable())
+                _player->CastSpell(_player, trainer_spell->spell, true);
+            else
+                _player->learnSpell(spellId);
+
+            WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
+            data << uint64(guid);
+            data << uint32(spellId);                                // should be same as in packet from client
+            SendPacket(&data);
+        }
+        else
+        {
+            return;
+        }
     }
+    else {
 
-    // remove fake death
-    if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
-        GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+        // remove fake death
+        if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+            GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // check present spell in trainer spell list
-    TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
-    if (!trainer_spells)
-        return;
+        // check present spell in trainer spell list
+        TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+        if (!trainer_spells)
+            return;
 
-    // not found, cheat?
-    TrainerSpell const* trainer_spell = trainer_spells->Find(spellId);
-    if (!trainer_spell)
-        return;
+        // not found, cheat?
+        TrainerSpell const* trainer_spell = trainer_spells->Find(spellId);
+        if (!trainer_spell)
+            return;
 
-    // can't be learn, cheat? Or double learn with lags...
-    if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
-        return;
+        // can't be learn, cheat? Or double learn with lags...
+        if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
+            return;
 
-    // apply reputation discount
-    uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
+        // apply reputation discount
+        uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
 
-    // check money requirement
-    if (!_player->HasEnoughMoney(nSpellCost))
-        return;
+        // check money requirement
+        if (!_player->HasEnoughMoney(nSpellCost))
+            return;
 
-    _player->ModifyMoney(-int32(nSpellCost));
+        _player->ModifyMoney(-int32(nSpellCost));
 
-    unit->SendPlaySpellVisual(179); // 53 SpellCastDirected
-    unit->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
+        unit->SendPlaySpellVisual(179); // 53 SpellCastDirected
+        unit->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
 
-    // learn explicitly or cast explicitly
-    if (trainer_spell->IsCastable())
-        _player->CastSpell(_player, trainer_spell->spell, true);
-    else
-        _player->learnSpell(spellId);
+        // learn explicitly or cast explicitly
+        if (trainer_spell->IsCastable())
+            _player->CastSpell(_player, trainer_spell->spell, true);
+        else
+            _player->learnSpell(spellId);
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
-    data << uint64(guid);
-    data << uint32(spellId);                                // should be same as in packet from client
-    SendPacket(&data);
+        WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
+        data << uint64(guid);
+        data << uint32(spellId);                                // should be same as in packet from client
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)

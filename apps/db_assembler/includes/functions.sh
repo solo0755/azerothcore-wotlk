@@ -300,7 +300,8 @@ function dbasm_db_import() {
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
-
+	echo "pzx user  passwd is : $MYSQL_USER  $MYSQL_PASS"
+	
     export MYSQL_PWD=$MYSQL_PASS
 
 
