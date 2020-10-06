@@ -5853,8 +5853,8 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 }
 
 uint32 Player::GetShieldBlockValue() const
-{
-    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + GetStat(STAT_STRENGTH) * 0.5f - 10)*m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
+{   //PZX 力量不加格挡
+    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0:GetStat(STAT_STRENGTH)) * 0.5f - 10)*m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
 
     value = (value < 0) ? 0 : value;
 
@@ -5873,15 +5873,16 @@ float Player::GetMeleeCritFromAgility()
     GtChanceToMeleeCritEntry     const* critRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
     if (critBase == NULL || critRatio == nullptr)
         return 0.0f;
-
-    float crit = critBase->base + GetStat(STAT_AGILITY)*critRatio->ratio;
+    //PZX 敏捷不加暴击 
+    float crit = critBase->base + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0:GetStat(STAT_AGILITY))*critRatio->ratio;
     return crit*100.0f;
 }
 
 void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
 {
+
     // Table for base dodge values
-    const float dodge_base[MAX_CLASSES] =
+    const float dodge_base[MAX_CLASSES] = 
     {
          0.036640f, // Warrior
          0.034943f, // Paladi
@@ -5925,10 +5926,12 @@ void Player::GetDodgeFromAgility(float &diminishing, float &nondiminishing)
     // TODO: research if talents/effects that increase total agility by x% should increase non-diminishing part
     float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + STAT_AGILITY][BASE_PCT];
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
+    //PZX 敏捷不加暴击
+    bonus_agility = (sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0.0f : bonus_agility;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
-    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass-1];
-    nondiminishing = 100.0f * (dodge_base[pclass-1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass-1]);
+    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio *  crit_to_dodge[pclass-1];
+    nondiminishing = 100.0f * (dodge_base[pclass-1] + base_agility * dodgeRatio->ratio *  crit_to_dodge[pclass-1]);
 }
 
 float Player::GetSpellCritFromIntellect()
@@ -5944,7 +5947,7 @@ float Player::GetSpellCritFromIntellect()
     if (critBase == NULL || critRatio == nullptr)
         return 0.0f;
 
-    float crit=critBase->base + GetStat(STAT_INTELLECT)*critRatio->ratio;
+    float crit=critBase->base + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0:GetStat(STAT_INTELLECT))*critRatio->ratio;
     return crit*100.0f;
 }
 

@@ -13,6 +13,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "ScriptMgr.h"
+#include "Configuration/PzxConfig.h"
 
 inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 {
@@ -236,7 +237,7 @@ void Player::UpdateArmor()
 
     float value = GetModifierValue(unitMod, BASE_VALUE);   // base armor (from items)
     value *= GetModifierValue(unitMod, BASE_PCT);           // armor percent from items
-    value += GetStat(STAT_AGILITY) * 2.0f;                  // armor bonus from stats
+    value += sPzxConfig->GetIntDefault("diminishing.close", 0) > 0?0.0f:GetStat(STAT_AGILITY) * 2.0f;                  // armor bonus from stats  //PZX 关闭敏捷加成护甲
     value += GetModifierValue(unitMod, TOTAL_VALUE);
 
     //add dynamic flat mods
@@ -726,6 +727,7 @@ void Player::UpdateParryPercentage()
 
         value = std::max(diminishing + nondiminishing, 0.0f);
     }
+    value = (sPzxConfig->GetIntDefault("diminishing.close", 0) > 0&&value > sPzxConfig->GetFloatDefault("diminishing.parry", 20.0f))? sPzxConfig->GetFloatDefault("diminishing.parry", 20.0f) : value;
 
     SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, value);
 }
