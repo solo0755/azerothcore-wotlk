@@ -8,7 +8,7 @@
 #include "common_example.h"
 #include "ScriptedGossip.h"
 #include "GuildMgr.h"
-//#pragma execution_character_set("UTF-8") // 汉化所有cpp文件
+#pragma execution_character_set("UTF-8") // 汉化所有cpp文件
 #define RESETTALENTCOST 0
 
 class synthesisTrainer : public CreatureScript
