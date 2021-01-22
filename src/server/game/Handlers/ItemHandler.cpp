@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "PzxConfig.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -16,6 +15,7 @@
 #include "UpdateData.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
+#include "Config.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -1316,8 +1316,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-
-	if (gift->GetEntry() == sPzxConfig->GetIntDefault("huanhua.id", 21831)) {//幻化物品区间  硬编码
+	if (gift->GetEntry() == sConfigMgr->GetIntDefault("huanhua.id", 21831)) {//幻化物品区间  硬编码
 		uint32 _itemID = item->GetEntry();
 		uint8 eSolt = _player->FindEquipSlot(item->GetTemplate(), NULL_SLOT, true);
 		if (eSolt == EQUIPMENT_SLOT_MAINHAND || eSolt == EQUIPMENT_SLOT_OFFHAND) {
@@ -1350,11 +1349,11 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 		//PSendSysMessage(player, u8"您的武器幻化完成");
 		return;
 	}
-	else if (gift->GetEntry() == sPzxConfig->GetIntDefault("itemup.id", 17308)) {//物品升级，硬编码，
+	else if (gift->GetEntry() == sConfigMgr->GetIntDefault("itemup.id", 17308)) {//物品升级，硬编码，
 		
-		std::string prefix = sPzxConfig->GetStringDefault("itemup.prefix", "uptonext");
-		std::string message = sPzxConfig->GetStringDefault("itemup.message", "ShowUPFrame");
-		uint8 channel = sPzxConfig->GetIntDefault("itemup.channel", 4);
+		std::string prefix = sConfigMgr->GetStringDefault("itemup.prefix", "uptonext");
+		std::string message = sConfigMgr->GetStringDefault("itemup.message", "ShowUPFrame");
+		uint8 channel = sConfigMgr->GetIntDefault("itemup.channel", 4);
 		uint32 _itemID = item->GetEntry();
 		ItemUpData itemUpdata;
 		itemUpdata.oitem = item;
@@ -1412,20 +1411,22 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 				oss << (*result)[16].GetUInt32() << "|";
 				oss << (*result)[17].GetUInt32() << "|";
 				//根据会员等级计算出基础概率
-				uint32 basePrc = (*result)[0].GetUInt32()*sPzxConfig->GetIntDefault("itemup.vipPrc", 5);
+				uint32 basePrc = (*result)[0].GetUInt32()* sConfigMgr->GetIntDefault("itemup.vipPrc", 5);
 				oss << basePrc << "|";
 				itemUpdata.basePct = basePrc;
 				//幸运石种类名称
 				const ItemTemplate * itemt = sObjectMgr->GetItemTemplate((*result)[18].GetUInt32());
 				if (itemt) {
 					//后期要换浮点数
-					uint32 max_prc = _player->GetItemCount((*result)[18].GetUInt32(), false)*sPzxConfig->GetIntDefault("itemup.luckStonPrc", 2);
+					uint32 max_prc = _player->GetItemCount((*result)[18].GetUInt32(), false)* sConfigMgr->GetIntDefault("itemup.luckStonPrc", 2);
 					itemUpdata.luckadd = max_prc;
 					oss << itemt->Name1<< "|";//通过换算公式获取
 					oss << max_prc << "|";
 				}
 				else {
-					oss << sPzxConfig->GetStringDefault("itemup.luckstonName", "幸运钻") << "|0|";//通过换算公式获取
+                    std::string ss = sConfigMgr->GetStringDefault("itemup.luckstonName", "xxxx");
+					oss << ss<< "|0|";
+                    //通过换算公式获取
 				}
 				uint8 crazyStatus = (*result)[19].GetUInt32();
 				itemUpdata.crazyStatus = crazyStatus;
@@ -1451,12 +1452,10 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 #endif
 				_player->setVipItemUPInfo(itemUpdata);
 				//还要在player对象中生成一个临时变量
-
 		}
 		else {
 			//该物品不能强化
-			_player->GetSession()->SendNotification(u8"这个物品不能被强化");
-
+			_player->GetSession()->SendNotification("this item is pzx error");
 		}
 		//_player->DestroyItemCount(gift, 1, true);
 		return;//硬编码后不可以包装了

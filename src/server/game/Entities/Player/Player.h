@@ -20,7 +20,6 @@
 #include "Battleground.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 

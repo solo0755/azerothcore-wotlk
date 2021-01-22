@@ -1,9 +1,9 @@
-﻿
+
 #include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Singleton.h>
 #include "ace/Configuration_Import_Export.h"
 #include "Database/DatabaseEnv.h"
-#include "Configuration/PzxConfig.h"
+#include "Configuration/Config.h"
 
 struct MenuTree
 {

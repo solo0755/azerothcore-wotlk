@@ -72,7 +72,6 @@ void AddSC_generic_creature();
 void AddSC_go_scripts();
 void AddSC_guards();
 void AddSC_item_scripts();
-void AddSC_REFORGER_NPC();
 void AddSC_item_example();
 void AddSC_synthesis_Trainer();
 void AddSC_npc_professions();
@@ -655,7 +654,6 @@ void AddWorldScripts()
     AddSC_go_scripts();
     AddSC_guards();
     AddSC_item_scripts();
-	AddSC_REFORGER_NPC();
     AddSC_npc_professions();
     AddSC_npc_innkeeper();
     AddSC_npcs_special();

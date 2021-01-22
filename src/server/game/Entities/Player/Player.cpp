@@ -77,8 +77,7 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
-#include "Configuration/PzxConfig.h"
-
+#include "Configuration/Config.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -2958,7 +2957,7 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     if (!creature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return nullptr;
 
-    if (creature->GetCreatureTemplate()->Entry == sPzxConfig->GetIntDefault("newnpc.id", 200002)) {
+    if (creature->GetCreatureTemplate()->Entry == sConfigMgr->GetIntDefault("newnpc.id", 200002)) {
         return creature;
     }
     // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
@@ -5923,7 +5922,7 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 
 uint32 Player::GetShieldBlockValue() const
 {   //PZX 力量不加格挡
-    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_STRENGTH)) * 0.5f - 10)*m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
+    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + ((sConfigMgr->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_STRENGTH)) * 0.5f - 10)*m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
 
 
     value = (value < 0) ? 0 : value;
@@ -5945,7 +5944,7 @@ float Player::GetMeleeCritFromAgility()
         return 0.0f;
 
     //PZX 敏捷不加暴击 
-    float crit = critBase->base + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_AGILITY))*critRatio->ratio;
+    float crit = critBase->base + ((sConfigMgr->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_AGILITY))*critRatio->ratio;
     return crit * 100.0f;
 
 
@@ -6000,7 +5999,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
     float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + STAT_AGILITY][BASE_PCT];
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
     //PZX 敏捷不加暴击
-    bonus_agility = (sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0.0f : bonus_agility;
+    bonus_agility = (sConfigMgr->GetIntDefault("diminishing.close", 0) > 0) ? 0.0f : bonus_agility;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
     diminishing = 100.0f * bonus_agility * dodgeRatio->ratio *  crit_to_dodge[pclass - 1];
@@ -6022,7 +6021,7 @@ float Player::GetSpellCritFromIntellect()
     if (critBase == NULL || critRatio == nullptr)
         return 0.0f;
 
-    float crit = critBase->base + ((sPzxConfig->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_INTELLECT))*critRatio->ratio;
+    float crit = critBase->base + ((sConfigMgr->GetIntDefault("diminishing.close", 0) > 0) ? 0 : GetStat(STAT_INTELLECT))*critRatio->ratio;
     return crit * 100.0f;
 }
 
@@ -8050,21 +8049,6 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (only_level_scale && !ssv)
         return;
 
-    //物品重铸
-    uint32 statcount = proto->StatsCount;
-    ReforgeData* reforgeData = NULL;
-    bool decreased = false;
-    if (statcount < MAX_ITEM_PROTO_STATS)
-    {
-        if (Item* invItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        {
-            if (reforgeMap.find(invItem->GetGUIDLow()) != reforgeMap.end())
-            {
-                reforgeData = &reforgeMap[invItem->GetGUIDLow()];
-                ++statcount;
-            }
-        }
-    }
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
     {
@@ -8080,28 +8064,15 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         }
         else
         {
-            if (i >= statcount)
+            if (i >= proto->StatsCount)
                 continue;
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
-
-            if (reforgeData)
-            {
-                if (i == statcount - 1)
-                {
-                    statType = reforgeData->increase;
-                    val = reforgeData->stat_value;
-                }
-                else if (!decreased && reforgeData->decrease == statType)
-                {
-                    val -= reforgeData->stat_value;
-                    decreased = true;
-                }
-            }
         }
 
         if (val == 0)
             continue;
+
 
         switch (statType)
         {

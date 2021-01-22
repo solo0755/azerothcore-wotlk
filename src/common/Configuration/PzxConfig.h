@@ -3,7 +3,7 @@
 #include <vector>
 #include <ace/Configuration_Import_Export.h>
 #include <ace/Thread_Mutex.h>
-#include <AutoPtr.h>
+#include "ace/Auto_Ptr.h"
 
 typedef acore::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 

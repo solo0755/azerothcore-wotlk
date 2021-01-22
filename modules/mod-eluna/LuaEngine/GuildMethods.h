@@ -278,7 +278,7 @@ namespace LuaGuild
         guild->DeleteMember(trans, player->GET_GUID(), isDisbanding);
 #elif defined AZEROTHCORE
         SQLTransaction trans(nullptr);
-        guild->DeleteMember(trans, player->GET_GUID(), isDisbanding);
+        guild->DeleteMember(player->GET_GUID(), isDisbanding,  true, true);
 #else
         guild->DelMember(player->GET_GUID(), isDisbanding);
 #endif

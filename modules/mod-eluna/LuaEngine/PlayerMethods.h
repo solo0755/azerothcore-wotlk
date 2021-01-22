@@ -3485,16 +3485,16 @@ namespace LuaPlayer
 
 		const ItemTemplate* temp = eObjectMgr->GetItemTemplate(itemId);
 		if (temp) {
-			if (temp->ItemLevel > sPzxConfig->GetIntDefault("GetItemLevel", 251) || temp->Quality > sPzxConfig->GetIntDefault("GetItemQuality", 4))
+			if (temp->ItemLevel > sConfigMgr->GetIntDefault("GetItemLevel", 251) || temp->Quality > sConfigMgr->GetIntDefault("GetItemQuality", 4))
 			{
 
 				return 1;//获取的物品质量等级过高
 			}
-			std::list<std::string> allForbi = sPzxConfig->GetKeysByString("forbiddenClass");
+			std::list<std::string> allForbi = sConfigMgr->GetKeysByString("forbiddenClass");
 			list<std::string>::iterator itor = allForbi.begin();
 			while (itor != allForbi.end())
 			{
-				int forbiddenClassA = sPzxConfig->GetIntDefault((*itor).c_str(), 0);
+				int forbiddenClassA = sConfigMgr->GetIntDefault((*itor).c_str(), 0);
 				if (temp->Class == forbiddenClassA) {
 					return 1;//这种类型的物品禁止获取
 				}

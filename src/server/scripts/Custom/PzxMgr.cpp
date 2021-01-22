@@ -1,4 +1,4 @@
-﻿#include "PzxMgr.h"
+#include "PzxMgr.h"
 //#include "Policies/SingletonImp.h"
 #include "ace/Thread_Manager.h"
 //#include "ace/OS_NS_time.h"
@@ -6,7 +6,7 @@
 #include "ace/Log_Msg.h"
 #include "ace/Reactor.h"
 #include "ace/Event_Handler.h"
-
+#include "Configuration/Config.h"
 //#include "MangosSocketMgrImpl.h"
 
 //template class PzxMgr<WorldSocket>;
@@ -327,7 +327,8 @@ void PzxMgr::loadAllPonits()
 
 
 	//同步积分 这里只能有一个服务器做
-	if (sPzxConfig->GetIntDefault("server.computerPoint", 1)) {
+	if (sConfigMgr->GetIntDefault("server.computerPoint", 1)) {
+           // sPzxConfig
 
 		_AccountPointMap _accountPMap;
 		//查询

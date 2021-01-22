@@ -739,7 +739,7 @@ public:
 		{
 		case 999:
 			sPzxMgr->Reload();
-			sPzxConfig->Reload();
+            sConfigMgr->Reload();
 			player->CLOSE_GOSSIP_MENU();
 			return;
 		case 100:
@@ -860,7 +860,7 @@ public:
 			{
 				if (itr->second.ItemId == getItemID)
 				{
-					if (itr->second.Quality< sPzxConfig->GetIntDefault("item.quality", ITEM_QUALITY_LEGENDARY))
+					if (itr->second.Quality< sConfigMgr->GetIntDefault("item.quality", ITEM_QUALITY_LEGENDARY))
 					{
 						if (player->HasItemCount(getItemID, 1, true)) {//已经有一件了
 							PSendSysMessage(player, u8"[系统消息]:该物品唯一");
@@ -900,9 +900,9 @@ public:
 
 void AddSC_item_example()
 {
-	if (!sPzxConfig->LoadInitial("pzx.conf")) {
-		sLog->outError(u8"未找到pzx.conf");
-	}
+	//if (!sPzxConfig->LoadInitial("pzx.conf")) {
+	//	sLog->outError(u8"未找到pzx.conf");
+	//}
 	sPzxMgr->Reload();
 	sPzxMgr->startSynDB();//启动定时任务
     new item_example();

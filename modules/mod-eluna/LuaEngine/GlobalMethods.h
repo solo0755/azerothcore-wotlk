@@ -8,7 +8,7 @@
 #define GLOBALMETHODS_H
 
 #include "BindingMap.h"
-#include "Configuration/PzxConfig.h"
+#include "Configuration/Config.h"
 
 #ifdef AZEROTHCORE
 #include "BanManager.h"
@@ -1186,7 +1186,7 @@ namespace LuaGlobalFunctions
     int ReloadEluna(lua_State* /*L*/)
     {
         Eluna::ReloadEluna();
-		sPzxConfig->Reload();
+        sConfigMgr->Reload();
         return 0;
     }
 
