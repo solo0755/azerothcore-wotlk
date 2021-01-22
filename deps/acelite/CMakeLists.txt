@@ -33,7 +33,6 @@ else()
     ace/Asynch_IO_Impl.cpp
     ace/Asynch_Pseudo_Task.cpp
     ace/Atomic_Op.cpp
-    ace/Auto_Ptr.cpp
     ace/Barrier.cpp
     ace/Base_Thread_Adapter.cpp
     ace/Based_Pointer_Repository.cpp
