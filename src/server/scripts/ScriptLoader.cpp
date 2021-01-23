@@ -73,6 +73,7 @@ void AddSC_go_scripts();
 void AddSC_guards();
 void AddSC_item_scripts();
 void AddSC_item_example();
+void AddSC_world_example();
 void AddSC_synthesis_Trainer();
 void AddSC_npc_professions();
 void AddSC_npc_innkeeper();
@@ -1197,6 +1198,7 @@ void AddCustomScripts()
 {
 #ifdef SCRIPTS
     AddSC_item_example();
+    AddSC_world_example();
     AddSC_synthesis_Trainer();
 	//~ AddSC_MySuperScript();
 

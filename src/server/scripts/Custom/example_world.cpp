@@ -46,11 +46,11 @@ public:
     // These two methods are called before/after the world config is loaded at startup, or on config reload
     void OnBeforeConfigLoad(bool reload) {
         if (!reload) {
-            std::string conf_path = _CONF_DIR;
-            std::string cfg_file = conf_path + "/pzx.conf";
-            std::string cfg_def_file = cfg_file + ".dist";
-            sConfigMgr->LoadMore(cfg_def_file.c_str());
-            sConfigMgr->LoadMore(cfg_file.c_str());
+            //std::string conf_path = _CONF_DIR;
+            //std::string cfg_file = conf_path + "/pzx.conf";
+            //std::string cfg_def_file = cfg_file + ".dist";
+           // sConfigMgr->LoadMore(cfg_def_file.c_str());
+            sConfigMgr->LoadMore("pzx.conf");
         }
 
     }
