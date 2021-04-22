@@ -13,6 +13,7 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "ScriptMgr.h"
+#include "Configuration/Config.h"
 
 inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 {

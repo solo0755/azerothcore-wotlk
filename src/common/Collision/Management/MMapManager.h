@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <shared_mutex>
 
-//  memory management
+ //  memory management
 inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
 {
     return (void*)new unsigned char[size];
@@ -22,7 +22,7 @@ inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
 
 inline void dtCustomFree(void* ptr)
 {
-    delete [] (unsigned char*)ptr;
+    delete[](unsigned char*)ptr;
 }
 
 //  move map related classes

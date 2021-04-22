@@ -5,14 +5,19 @@
  */
 
 #include "Common.h"
-#include "Item.h"
-#include "Log.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include "Opcodes.h"
+#include "Log.h"
+#include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "Item.h"
+#include "UpdateData.h"
+#include "ObjectAccessor.h"
 #include "SpellInfo.h"
+#include "Config.h"
+#include "ScriptMgr.h"
+
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -1349,6 +1354,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 		//PSendSysMessage(player, u8"���������û����");
 		return;
 	}
+#ifdef OPEN_VIP_ITEMUP
 	else if (gift->GetEntry() == sConfigMgr->GetIntDefault("itemup.id", 17308)) {//��Ʒ������Ӳ���룬
 		
 		std::string prefix = sConfigMgr->GetStringDefault("itemup.prefix", "uptonext");
@@ -1460,6 +1466,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 		//_player->DestroyItemCount(gift, 1, true);
 		return;//Ӳ����󲻿��԰�װ��
 	}
+#endif
 
     if (item->IsEquipped())
     {

@@ -20,8 +20,6 @@
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 
@@ -159,21 +157,7 @@ typedef std::unordered_map<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
 typedef std::list<uint64> WhisperListContainer;
-struct ItemUpData
-{
-    ItemUpData() {
-        for (uint8 i = 0; i < 5; ++i) {
-            reqItem[i] = 0; reqItemCount[i] = 0;
-        }
-    }
-    Item * oitem;
-    uint32 toid;
-    uint32  reqItem[5];
-    uint32  reqItemCount[5];
-    int8 basePct;
-    int8 luckadd;
-    int8 crazyStatus;
-};
+
 struct SpellCooldown
 {
     uint32 end;
@@ -279,7 +263,7 @@ struct PlayerClassInfo
 
 struct PlayerLevelInfo
 {
-    PlayerLevelInfo() { for (unsigned char & stat : stats) stat = 0; }
+    PlayerLevelInfo() { for (unsigned char& stat : stats) stat = 0; }
 
     uint8 stats[MAX_STATS];
 };
@@ -322,11 +306,12 @@ struct PvPInfo
 {
     PvPInfo() {}
 
-    bool IsHostile{false};
-    bool IsInHostileArea{false};               ///> Marks if player is in an area which forces PvP flag
-    bool IsInNoPvPArea{false};                 ///> Marks if player is in a sanctuary or friendly capital city
-    bool IsInFFAPvPArea{false};                ///> Marks if player is in an FFAPvP area (such as Gurubashi Arena)
-    time_t EndTimer{0};                    ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
+    bool IsHostile{ false };
+    bool IsInHostileArea{ false };               ///> Marks if player is in an area which forces PvP flag
+    bool IsInNoPvPArea{ false };                 ///> Marks if player is in a sanctuary or friendly capital city
+    bool IsInFFAPvPArea{ false };                ///> Marks if player is in an FFAPvP area (such as Gurubashi Arena)
+    time_t EndTimer{ 0 };                        ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
+    time_t FFAPvPEndTimer{ 0 };                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
 struct DuelInfo
@@ -661,7 +646,7 @@ struct EquipmentSet
 {
     EquipmentSet()
     {
-        for (unsigned int & Item : Items)
+        for (unsigned int& Item : Items)
             Item = 0;
     }
 
@@ -721,19 +706,6 @@ enum InstanceResetWarningType
     RAID_INSTANCE_WARNING_MIN_SOON = 3,                    // WARNING! %s is scheduled to reset in %d minute(s). Please exit the zone or you will be returned to your bind location!
     RAID_INSTANCE_WELCOME = 4,                    // Welcome to %s. This raid instance is scheduled to reset in %s.
     RAID_INSTANCE_EXPIRED = 5
-};
-
-// PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
-enum ArenaTeamInfoType
-{
-    ARENA_TEAM_ID                = 0,
-    ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?
-    ARENA_TEAM_MEMBER            = 2,                       // 0 - captain, 1 - member
-    ARENA_TEAM_GAMES_WEEK        = 3,
-    ARENA_TEAM_GAMES_SEASON      = 4,
-    ARENA_TEAM_WINS_SEASON       = 5,
-    ARENA_TEAM_PERSONAL_RATING   = 6,
-    ARENA_TEAM_END               = 7
 };
 
 class InstanceSave;
@@ -1054,7 +1026,7 @@ public:                                                 // constructors
     [[nodiscard]] uint32 GetSpell() const { return m_spell; }
     void SetSpell(uint32 spell_id, Item* castItem = nullptr);
 
-    [[nodiscard]] Item*  GetSpellCastItem() const;
+    [[nodiscard]] Item* GetSpellCastItem() const;
     [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem != 0; }
 
     [[nodiscard]] uint32 GetMoney() const { return m_money; }
@@ -1070,8 +1042,8 @@ private:                                                // internal functions
     void Update(bool for_trader = true);
 
 private:                                                // fields
-    Player*    m_player;                                // Player who own of this TradeData
-    Player*    m_trader;                                // Player who trade with m_player
+    Player* m_player;                                // Player who own of this TradeData
+    Player* m_trader;                                // Player who trade with m_player
 
     bool       m_accepted;                              // m_player press accept for trade list
     bool       m_acceptProccess;                        // one from player/trader press accept and this processed
@@ -1274,7 +1246,7 @@ public:
     [[nodiscard]] Item* GetItemByEntry(uint32 entry) const;
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
-    [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] Bag* GetBagByPos(uint8 slot) const;
     [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
@@ -1787,10 +1759,10 @@ public:
     void InitPrimaryProfessions();
 
     [[nodiscard]] PlayerSpellMap const& GetSpellMap() const { return m_spells; }
-    PlayerSpellMap&       GetSpellMap() { return m_spells; }
+    PlayerSpellMap& GetSpellMap() { return m_spells; }
 
     [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
-    SpellCooldowns&       GetSpellCooldownMap() { return m_spellCooldowns; }
+    SpellCooldowns& GetSpellCooldownMap() { return m_spellCooldowns; }
 
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
@@ -2147,7 +2119,7 @@ public:
     uint8 GetGrantableLevels() { return m_grantableLevels; }
     void SetGrantableLevels(uint8 val) { m_grantableLevels = val; }
 
-    ReputationMgr&       GetReputationMgr() { return *m_reputationMgr; }
+    ReputationMgr& GetReputationMgr() { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
     void RewardReputation(Unit* victim, float rate);
@@ -2319,7 +2291,7 @@ public:
 
     bool HasFreeBattlegroundQueueId()
     {
-        for (auto & i : m_bgBattlegroundQueueID)
+        for (auto& i : m_bgBattlegroundQueueID)
             if (i == BATTLEGROUND_QUEUE_NONE)
                 return true;
         return false;
@@ -2327,7 +2299,7 @@ public:
 
     void RemoveBattlegroundQueueId(BattlegroundQueueTypeId val)
     {
-        for (auto & i : m_bgBattlegroundQueueID)
+        for (auto& i : m_bgBattlegroundQueueID)
             if (i == val)
             {
                 i = BATTLEGROUND_QUEUE_NONE;
@@ -2540,17 +2512,7 @@ public:
     // Set map to player and add reference
     void SetMap(Map* map) override;
     void ResetMap() override;
-    /*********************************************************/
-    /***                   PZX SYSTEM                    ***/
-    /*********************************************************/
-    uint32 m_trainerid;
-    void SetTrainerEntry(const uint32 id) { m_trainerid = id; }
-    uint32 GetTrainerEntry()const { return m_trainerid; }
-    int doVipItemUP();
-    void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIP������Ʒ����
-    /*********************************************************/
-    /***                   PZX SYSTEM    end              ***/
-    /*********************************************************/
+
     bool isAllowedToLoot(const Creature* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
@@ -2663,6 +2625,17 @@ public:
     void SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec);
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+    // Cinematic camera data and remote sight functions
+    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
+    void BeginCinematic();
+    void EndCinematic();
+    void UpdateCinematicLocation(uint32 diff);
+
+    std::string GetMapAreaAndZoneString();
+    std::string GetCoordsMapAreaAndZoneString();
 
 protected:
     // Gamemaster whisper whitelist
@@ -2991,7 +2964,7 @@ private:
     uint32 m_oldpetspell;
 
     AchievementMgr* m_achievementMgr;
-    ReputationMgr*  m_reputationMgr;
+    ReputationMgr* m_reputationMgr;
 
     SpellCooldowns m_spellCooldowns;
 

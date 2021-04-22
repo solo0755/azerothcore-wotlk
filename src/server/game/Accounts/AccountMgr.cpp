@@ -34,9 +34,10 @@ namespace AccountMgr
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT);
 
-        stmt->setString(0, username);
-        stmt->setString(1, CalculateShaPassHash(username, password));
-        stmt->setInt8(2, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
+        auto [salt, verifier] = acore::Crypto::SRP6::MakeRegistrationData(username, password);
+        stmt->setBinary(1, salt);
+        stmt->setBinary(2, verifier);
+        stmt->setInt8(3, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
 
         LoginDatabase.Execute(stmt);
 

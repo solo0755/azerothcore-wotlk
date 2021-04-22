@@ -241,7 +241,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     SendPacket(&data);
 }
 
-void WorldSession::SendTrainerList(uint64 guid, uint32 npcid)
+void WorldSession::SendTrainerList(uint64 guid, uint32 npcid)//PZX 
 {
     GetPlayer()->SetTrainerEntry(npcid);
     // remove fake death

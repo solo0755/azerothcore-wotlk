@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2010 - 2016 Eluna Lua Engine <http://emudevs.com/>
 * This program is free software licensed under GPL version 3
 * Please see the included DOCS/LICENSE.md for more information
@@ -1471,7 +1471,7 @@ namespace LuaPlayer
     }
 
 	int doItemUP(lua_State* L, Player* player) {//物品合成eluna脚本
-		Eluna::Push(L, player->doVipItemUP());
+		//Eluna::Push(L, player->doVipItemUP());
 		return 1;
 	}
     
@@ -3490,8 +3490,8 @@ namespace LuaPlayer
 
 				return 1;//获取的物品质量等级过高
 			}
-			std::list<std::string> allForbi = sConfigMgr->GetKeysByString("forbiddenClass");
-			list<std::string>::iterator itor = allForbi.begin();
+			std::vector<std::string> allForbi = sConfigMgr->GetKeysByString("forbiddenClass");
+            vector<std::string>::iterator itor = allForbi.begin();
 			while (itor != allForbi.end())
 			{
 				int forbiddenClassA = sConfigMgr->GetIntDefault((*itor).c_str(), 0);

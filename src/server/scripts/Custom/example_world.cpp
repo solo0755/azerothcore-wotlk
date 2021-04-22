@@ -50,7 +50,7 @@ public:
             //std::string cfg_file = conf_path + "/pzx.conf";
             //std::string cfg_def_file = cfg_file + ".dist";
            // sConfigMgr->LoadMore(cfg_def_file.c_str());
-            sConfigMgr->LoadMore("pzx.conf");
+            sConfigMgr->LoadAdditionalFile("pzx.conf");
         }
 
     }

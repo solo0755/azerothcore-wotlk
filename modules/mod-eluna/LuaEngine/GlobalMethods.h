@@ -8,7 +8,7 @@
 #define GLOBALMETHODS_H
 
 #include "BindingMap.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 
 #ifdef AZEROTHCORE
 #include "BanManager.h"
