@@ -2512,7 +2512,14 @@ public:
     // Set map to player and add reference
     void SetMap(Map* map) override;
     void ResetMap() override;
-
+    /*********************************************************/
+    /***                   PZX SYSTEM                    ***/
+    /*********************************************************/
+    uint32 m_trainerid;
+    void SetTrainerEntry(const uint32 id) { m_trainerid = id; }
+    uint32 GetTrainerEntry()const { return m_trainerid; }
+    //int doVipItemUP();
+    //void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIPÉý¼¶ÎïÆ·»º´æ
     bool isAllowedToLoot(const Creature* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
