@@ -1,12 +1,12 @@
-﻿/*
+/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/** \file
-    \ingroup Trinityd
-*/
+ /** \file
+     \ingroup Trinityd
+ */
 
 #include "ACSoap.h"
 #include "BigNumber.h"
@@ -111,24 +111,6 @@ int Master::Run()
     OpenSSLCrypto::threadsSetup();
     BigNumber seed1;
     seed1.SetRand(16 * 8);
-
-    sLog->outString("%s (worldserver-daemon)", GitRevision::GetFullVersion());
-    sLog->outString("<Ctrl-C> to stop.\n");
-
-    sLog->outString("   �����������[ ���������������[���������������[�������������[  �������������[ �����������������[�����[  �����[");
-    sLog->outString("  �����X�T�T�����[�^�T�T�������X�a�����X�T�T�T�T�a�����X�T�T�����[�����X�T�T�T�����[�^�T�T�����X�T�T�a�����U  �����U");
-    sLog->outString("  ���������������U  �������X�a �����������[  �������������X�a�����U   �����U   �����U   ���������������U");
-    sLog->outString("  �����X�T�T�����U �������X�a  �����X�T�T�a  �����X�T�T�����[�����U   �����U   �����U   �����X�T�T�����U");
-    sLog->outString("  �����U  �����U���������������[���������������[�����U  �����U�^�������������X�a   �����U   �����U  �����U");
-    sLog->outString("  �^�T�a  �^�T�a�^�T�T�T�T�T�T�a�^�T�T�T�T�T�T�a�^�T�a  �^�T�a �^�T�T�T�T�T�a    �^�T�a   �^�T�a  �^�T�a");
-    sLog->outString("                                �������������[ �������������[ �������������[ ���������������[");
-    sLog->outString("                                �����X�T�T�T�T�a�����X�T�T�T�����[�����X�T�T�����[�����X�T�T�T�a");
-    sLog->outString("                                �����U     �����U   �����U�������������X�a�����������[");
-    sLog->outString("                                �����U     �����U   �����U�����X�T�T�����[�����X�T�T�a");
-    sLog->outString("                                �^�������������[�^�������������X�a�����U  �����U���������������[");
-    sLog->outString("                                 �^�T�T�T�T�T�a �^�T�T�T�T�T�a �^�T�a  �^�T�a�^�T�T�T�T�T�T�a\n");
-
-    sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
