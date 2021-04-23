@@ -38,15 +38,16 @@ struct ElunaCreatureAI : ScriptedAI
     void UpdateAI(uint32 diff) override
 #endif
     {
+#ifdef TRINITY
+        //Spawns are handled by Creature.cpp - in function Creature::Update() 
+#else
         if (justSpawned)
         {
             justSpawned = false;
-#ifdef TRINITY
-            JustAppeared();
-#else
+
             JustRespawned();
-#endif
         }
+#endif
 
         if (!movepoints.empty())
         {
@@ -216,14 +217,22 @@ struct ElunaCreatureAI : ScriptedAI
     }
 
     // Called when hit by a spell
+#if defined TRINITY
+    void SpellHit(WorldObject* caster, SpellInfo const* spell) override
+#else
     void SpellHit(Unit* caster, SpellInfo const* spell) override
+#endif
     {
         if (!sEluna->SpellHit(me, caster, spell))
             ScriptedAI::SpellHit(caster, spell);
     }
 
     // Called when spell hits a target
+#if defined TRINITY
+    void SpellHitTarget(WorldObject* target, SpellInfo const* spell) override
+#else
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+#endif
     {
         if (!sEluna->SpellHitTarget(me, target, spell))
             ScriptedAI::SpellHitTarget(target, spell);

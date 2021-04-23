@@ -1,6 +1,6 @@
 # globals
-PROMPT_USER=""
-PROMPT_PASS=""
+PROMPT_USER="root"
+PROMPT_PASS="root"
 
 # use in a subshell
 function dbasm_resetExitCode() {

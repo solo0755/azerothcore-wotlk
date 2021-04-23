@@ -11,7 +11,9 @@
 #include "Config.h"
 
 #ifdef AZEROTHCORE
+
 #include "BanManager.h"
+
 enum BanMode
 {
     BAN_ACCOUNT = 1,
@@ -49,6 +51,24 @@ namespace LuaGlobalFunctions
     int GetCoreName(lua_State* L)
     {
         Eluna::Push(L, CORE_NAME);
+        return 1;
+    }
+
+    /**
+     * Returns emulator .conf RealmID
+     *
+     * - for MaNGOS returns the realmID as it is stored in the core.
+     * - for TrinityCore returns the realmID as it is in the conf file.
+     * @return uint32 realm ID
+     */
+
+    int GetRealmID(lua_State* L)
+    {
+#ifdef MANGOS
+        Eluna::Push(L, realmID);
+#else
+        Eluna::Push(L, sConfigMgr->GetIntDefault("RealmID", 1));
+#endif
         return 1;
     }
 
@@ -476,7 +496,11 @@ namespace LuaGlobalFunctions
         if (!areaEntry)
             return luaL_argerror(L, 1, "valid Area or Zone ID expected");
 
+#if defined(TRINITY)
+        Eluna::Push(L, areaEntry->AreaName[locale]);
+#else
         Eluna::Push(L, areaEntry->area_name[locale]);
+#endif
         return 1;
     }
 
@@ -1028,7 +1052,7 @@ namespace LuaGlobalFunctions
      *     CREATURE_EVENT_ON_REACH_WP                        = 6,  // (event, creature, type, id) - Can return true to stop normal action
      *     CREATURE_EVENT_ON_AIUPDATE                        = 7,  // (event, creature, diff) - Can return true to stop normal action
      *     CREATURE_EVENT_ON_RECEIVE_EMOTE                   = 8,  // (event, creature, player, emoteid) - Can return true to stop normal action
-     *     CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return new damage
+     *     CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return true to stop normal action, can return new damage as second return value.
      *     CREATURE_EVENT_ON_PRE_COMBAT                      = 10, // (event, creature, target) - Can return true to stop normal action
      *     // UNUSED
      *     CREATURE_EVENT_ON_OWNER_ATTACKED                  = 12, // (event, creature, target) - Can return true to stop normal action            // Not on mangos
@@ -1045,7 +1069,7 @@ namespace LuaGlobalFunctions
      *     CREATURE_EVENT_ON_RESET                           = 23, // (event, creature)
      *     CREATURE_EVENT_ON_REACH_HOME                      = 24, // (event, creature) - Can return true to stop normal action
      *     // UNUSED                                         = 25, // (event, creature)
-     *     CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true, newRespawnDelay
+     *     CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true to stop normal action, can return new respawndelay as second return value
      *     CREATURE_EVENT_ON_MOVE_IN_LOS                     = 27, // (event, creature, unit) - Can return true to stop normal action. Does not actually check LOS, just uses the sight range
      *     // UNUSED                                         = 28, // (event, creature)
      *     // UNUSED                                         = 29, // (event, creature)
@@ -1090,7 +1114,7 @@ namespace LuaGlobalFunctions
      *     CREATURE_EVENT_ON_REACH_WP                        = 6,  // (event, creature, type, id) - Can return true to stop normal action
      *     CREATURE_EVENT_ON_AIUPDATE                        = 7,  // (event, creature, diff) - Can return true to stop normal action
      *     CREATURE_EVENT_ON_RECEIVE_EMOTE                   = 8,  // (event, creature, player, emoteid) - Can return true to stop normal action
-     *     CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return new damage
+     *     CREATURE_EVENT_ON_DAMAGE_TAKEN                    = 9,  // (event, creature, attacker, damage) - Can return true to stop normal action, can return new damage as second return value.
      *     CREATURE_EVENT_ON_PRE_COMBAT                      = 10, // (event, creature, target) - Can return true to stop normal action
      *     // UNUSED
      *     CREATURE_EVENT_ON_OWNER_ATTACKED                  = 12, // (event, creature, target) - Can return true to stop normal action            // Not on mangos
@@ -1107,7 +1131,7 @@ namespace LuaGlobalFunctions
      *     CREATURE_EVENT_ON_RESET                           = 23, // (event, creature)
      *     CREATURE_EVENT_ON_REACH_HOME                      = 24, // (event, creature) - Can return true to stop normal action
      *     // UNUSED                                         = 25, // (event, creature)
-     *     CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true, newRespawnDelay
+     *     CREATURE_EVENT_ON_CORPSE_REMOVED                  = 26, // (event, creature, respawndelay) - Can return true to stop normal action, can return new respawndelay as second return value
      *     CREATURE_EVENT_ON_MOVE_IN_LOS                     = 27, // (event, creature, unit) - Can return true to stop normal action. Does not actually check LOS, just uses the sight range
      *     // UNUSED                                         = 28, // (event, creature)
      *     // UNUSED                                         = 29, // (event, creature)
@@ -1147,9 +1171,9 @@ namespace LuaGlobalFunctions
      * {
      *     GAMEOBJECT_EVENT_ON_AIUPDATE                    = 1,    // (event, go, diff)
      *     GAMEOBJECT_EVENT_ON_SPAWN                       = 2,    // (event, go)
-     *     GAMEOBJECT_EVENT_ON_DUMMY_EFFECT                = 3,    // (event, caster, spellid, effindex, go)
-     *     GAMEOBJECT_EVENT_ON_QUEST_ACCEPT                = 4,    // (event, player, go, quest) - Can return true
-     *     GAMEOBJECT_EVENT_ON_QUEST_REWARD                = 5,    // (event, player, go, quest, opt) - Can return true
+     *     GAMEOBJECT_EVENT_ON_DUMMY_EFFECT                = 3,    // (event, caster, spellid, effindex, go) - Can return true to stop normal action
+     *     GAMEOBJECT_EVENT_ON_QUEST_ACCEPT                = 4,    // (event, player, go, quest) - Can return true to stop normal action
+     *     GAMEOBJECT_EVENT_ON_QUEST_REWARD                = 5,    // (event, player, go, quest, opt) - Can return true to stop normal action
      *     GAMEOBJECT_EVENT_ON_DIALOG_STATUS               = 6,    // (event, player, go)
      *     GAMEOBJECT_EVENT_ON_DESTROYED                   = 7,    // (event, go, attacker)
      *     GAMEOBJECT_EVENT_ON_DAMAGED                     = 8,    // (event, go, attacker)
@@ -1158,7 +1182,7 @@ namespace LuaGlobalFunctions
      *     // UNUSED                                       = 11,   // (event, gameobject)
      *     GAMEOBJECT_EVENT_ON_ADD                         = 12,   // (event, gameobject)
      *     GAMEOBJECT_EVENT_ON_REMOVE                      = 13,   // (event, gameobject)
-     *     GAMEOBJECT_EVENT_ON_USE                         = 14,   // (event, go, player)
+     *     GAMEOBJECT_EVENT_ON_USE                         = 14,   // (event, go, player) - Can return true to stop normal action
      *     GAMEOBJECT_EVENT_COUNT
      * };
      * </pre>
@@ -1572,7 +1596,7 @@ namespace LuaGlobalFunctions
                 pCreature->SetActiveObjectState(false);
 
                 // Also initializes the AI and MMGen
-                pCreature->Summon(durorresptime ? TEMPSUMMON_TIMED_OR_DEAD_DESPAWN : TEMPSUMMON_MANUAL_DESPAWN, durorresptime);
+                pCreature->Summon(durorresptime ? TEMPSPAWN_TIMED_OR_DEAD_DESPAWN : TEMPSPAWN_MANUAL_DESPAWN, durorresptime);
 
                 // Creature Linking, Initial load is handled like respawn
                 if (pCreature->IsLinkingEventTrigger())
@@ -1638,6 +1662,7 @@ namespace LuaGlobalFunctions
                 // DEBUG_LOG(GetMangosString(LANG_GAMEOBJECT_CURRENT), gInfo->name, db_lowGUID, x, y, z, o);
 
                 map->Add(pGameObj);
+                pGameObj->AIM_Initialize();
 
                 eObjectMgr->AddGameobjectToGrid(db_lowGUID, eObjectMgr->GetGOData(db_lowGUID));
 
@@ -1661,6 +1686,7 @@ namespace LuaGlobalFunctions
                 pGameObj->SetRespawnTime(durorresptime / IN_MILLISECONDS);
 
                 map->Add(pGameObj);
+                pGameObj->AIM_Initialize();
 
                 Eluna::Push(L, pGameObj);
             }
@@ -2069,6 +2095,7 @@ namespace LuaGlobalFunctions
      * @param uint32 cod = 0 : cod money amount
      * @param uint32 entry = 0 : entry of an [Item] to send with mail
      * @param uint32 amount = 0 : amount of the [Item] to send with mail
+     * @return uint32 itemGUIDlow : low GUID of the item. Up to 12 values returned, returns nil if no further items are sent
      */
     int SendMail(lua_State* L)
     {
@@ -2132,6 +2159,11 @@ namespace LuaGlobalFunctions
                 item->SaveToDB();
 #endif
                 draft.AddItem(item);
+#if defined TRINITY
+                Eluna::Push(L, item->GetGUID().GetCounter());
+#else
+                Eluna::Push(L, item->GetGUIDLow());
+#endif
                 ++addedItems;
             }
         }
@@ -2143,7 +2175,7 @@ namespace LuaGlobalFunctions
 #else
         draft.SendMailTo(MailReceiver(receiverPlayer, MAKE_NEW_GUID(receiverGUIDLow, 0, HIGHGUID_PLAYER)), sender);
 #endif
-        return 0;
+        return addedItems;
     }
 
     /**
@@ -2300,10 +2332,10 @@ namespace LuaGlobalFunctions
             TaxiPathNodeEntry entry;
 #ifdef TRINITY
             // mandatory
-            entry.MapID = Eluna::CHECKVAL<uint32>(L, start);
-            entry.LocX = Eluna::CHECKVAL<float>(L, start + 1);
-            entry.LocY = Eluna::CHECKVAL<float>(L, start + 2);
-            entry.LocZ = Eluna::CHECKVAL<float>(L, start + 3);
+            entry.ContinentID = Eluna::CHECKVAL<uint32>(L, start);
+            entry.Loc.X = Eluna::CHECKVAL<float>(L, start + 1);
+            entry.Loc.Y = Eluna::CHECKVAL<float>(L, start + 2);
+            entry.Loc.Z = Eluna::CHECKVAL<float>(L, start + 3);
             // optional
             entry.Flags = Eluna::CHECKVAL<uint32>(L, start + 4, 0);
             entry.Delay = Eluna::CHECKVAL<uint32>(L, start + 5, 0);
@@ -2351,10 +2383,10 @@ namespace LuaGlobalFunctions
             entry.PathID = pathId;
             entry.NodeIndex = nodeId;
             nodeEntry->ID = index;
-            nodeEntry->map_id = entry.MapID;
-            nodeEntry->x = entry.LocX;
-            nodeEntry->y = entry.LocY;
-            nodeEntry->z = entry.LocZ;
+            nodeEntry->ContinentID = entry.ContinentID;
+            nodeEntry->Pos.X = entry.Loc.X;
+            nodeEntry->Pos.Y = entry.Loc.Y;
+            nodeEntry->Pos.Z = entry.Loc.Z;
             nodeEntry->MountCreatureID[0] = mountH;
             nodeEntry->MountCreatureID[1] = mountA;
             sTaxiNodesStore.SetEntry(nodeId++, nodeEntry);
@@ -2381,10 +2413,16 @@ namespace LuaGlobalFunctions
             return 1;
         sTaxiPathSetBySource[startNode][nodeId - 1] = TaxiPathBySourceAndDestination(pathId, price);
         TaxiPathEntry* pathEntry = new TaxiPathEntry();
+#ifdef TRINITY
+        pathEntry->FromTaxiNode = startNode;
+        pathEntry->ToTaxiNode = nodeId - 1;
+        pathEntry->Cost = price;
+#else
         pathEntry->from = startNode;
         pathEntry->to = nodeId - 1;
-        pathEntry->ID = pathId;
         pathEntry->price = price;
+#endif
+        pathEntry->ID = pathId;
         sTaxiPathStore.SetEntry(pathId, pathEntry);
         Eluna::Push(L, pathId);
         return 1;

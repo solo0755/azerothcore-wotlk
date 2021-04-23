@@ -2064,6 +2064,24 @@ namespace LuaPlayer
             player->SetTitle(t, false);
         return 0;
     }
+
+
+#if defined(TRINITY) || defined(AZEROTHCORE)
+    /**
+     * Adds the specified achievement to the [Player]s
+     *
+     * @param uint32 achievementid
+     */
+    int SetAchievement(lua_State* L, Player* player)
+    {
+        uint32 id = Eluna::CHECKVAL<uint32>(L, 2);
+        AchievementEntry const* t = sAchievementStore.LookupEntry(id);
+        if (t)
+            player->CompletedAchievement(t);
+        return 0;
+    }
+#endif
+
 #endif
 
 #if !defined TRINITY && !AZEROTHCORE
@@ -2269,10 +2287,11 @@ namespace LuaPlayer
         WorldPacket data(MSG_AUCTION_HELLO, 12);
 #ifdef TRINITY
         data << uint64(unit->GetGUID().GetCounter());
+        data << uint32(ahEntry->ID);
 #else
         data << uint64(unit->GetGUIDLow());
-#endif
         data << uint32(ahEntry->houseId);
+#endif
         data << uint8(1);
 #ifdef CMANGOS
         player->GetSession()->SendPacket(data);
@@ -2451,10 +2470,14 @@ namespace LuaPlayer
             for (BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end();)
             {
                 if (itr->first != player->GetMapId())
-                    //player->UnbindInstance(itr, Difficulty(i));
+                {
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUIDLow(), itr->first, Difficulty(i), true, player);
+                    itr = binds.begin();
+                }
                 else
+                {
                     ++itr;
+                }
             }
         }
 #else
@@ -2680,19 +2703,17 @@ namespace LuaPlayer
      * Removes the [Spell] from the [Player]
      *
      * @param uint32 entry : entry of a [Spell]
-     * @param bool disabled = false
-     * @param bool learnLowRank = true
      */
     int RemoveSpell(lua_State* L, Player* player)
     {
         uint32 entry = Eluna::CHECKVAL<uint32>(L, 2);
-        bool disabled = Eluna::CHECKVAL<bool>(L, 3, false);
-        bool learn_low_rank = Eluna::CHECKVAL<bool>(L, 4, true);
 
 #ifdef TRINITY
-        player->RemoveSpell(entry, disabled, learn_low_rank);
+        player->RemoveSpell(entry);
+#elif defined (AZEROTHCORE)
+        player->removeSpell(entry, SPEC_MASK_ALL, false);
 #else
-        player->removeSpell(entry, disabled, learn_low_rank);
+        player->removeSpell(entry);
 #endif
         return 0;
     }
@@ -3361,11 +3382,19 @@ namespace LuaPlayer
         {
             if (SkillLineEntry const* entry = sSkillLineStore.LookupEntry(i))
             {
+#ifdef TRINITY
+                if (entry->CategoryID == SKILL_CATEGORY_LANGUAGES || entry->CategoryID == SKILL_CATEGORY_GENERIC)
+                    continue;
+
+                if (player->HasSkill(entry->ID))
+                    player->UpdateSkill(entry->ID, step);
+#else
                 if (entry->categoryId == SKILL_CATEGORY_LANGUAGES || entry->categoryId == SKILL_CATEGORY_GENERIC)
                     continue;
 
                 if (player->HasSkill(entry->id))
                     player->UpdateSkill(entry->id, step);
+#endif
             }
         }
 
