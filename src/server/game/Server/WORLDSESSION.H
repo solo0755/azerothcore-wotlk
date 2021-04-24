@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
- /// \addtogroup u2w
- /// @{
- /// \file
+/// \addtogroup u2w
+/// @{
+/// \file
 
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
@@ -15,6 +15,7 @@
 #include "AuthDefines.h"
 #include "AddonMgr.h"
 #include "BanManager.h"
+#include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
@@ -23,6 +24,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <utility>
+#include <map>
 
 class Creature;
 class GameObject;
@@ -59,14 +61,14 @@ namespace lfg
 
 enum AccountDataType
 {
-    GLOBAL_CONFIG_CACHE = 0,                    // 0x01 g
-    PER_CHARACTER_CONFIG_CACHE = 1,                    // 0x02 p
-    GLOBAL_BINDINGS_CACHE = 2,                    // 0x04 g
-    PER_CHARACTER_BINDINGS_CACHE = 3,                    // 0x08 p
-    GLOBAL_MACROS_CACHE = 4,                    // 0x10 g
-    PER_CHARACTER_MACROS_CACHE = 5,                    // 0x20 p
-    PER_CHARACTER_LAYOUT_CACHE = 6,                    // 0x40 p
-    PER_CHARACTER_CHAT_CACHE = 7,                    // 0x80 p
+    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
+    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
+    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
+    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
+    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
+    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
+    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
+    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
 };
 
 #define NUM_ACCOUNT_DATA_TYPES        8
@@ -76,9 +78,9 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() : Data("") {}
+    AccountData() :  Data("") {}
 
-    time_t Time{ 0 };
+    time_t Time{0};
     std::string Data;
 };
 
@@ -92,27 +94,27 @@ enum PartyOperation
 
 enum BFLeaveReason
 {
-    BF_LEAVE_REASON_CLOSE = 0x00000001,
+    BF_LEAVE_REASON_CLOSE     = 0x00000001,
     //BF_LEAVE_REASON_UNK1      = 0x00000002, (not used)
     //BF_LEAVE_REASON_UNK2      = 0x00000004, (not used)
-    BF_LEAVE_REASON_EXITED = 0x00000008,
+    BF_LEAVE_REASON_EXITED    = 0x00000008,
     BF_LEAVE_REASON_LOW_LEVEL = 0x00000010,
 };
 
 enum ChatRestrictionType
 {
     ERR_CHAT_RESTRICTED = 0,
-    ERR_CHAT_THROTTLED = 1,
-    ERR_USER_SQUELCHED = 2,
+    ERR_CHAT_THROTTLED  = 1,
+    ERR_USER_SQUELCHED  = 2,
     ERR_YELL_RESTRICTED = 3
 };
 
 enum CharterTypes
 {
-    GUILD_CHARTER_TYPE = 9,
-    ARENA_TEAM_CHARTER_2v2_TYPE = 2,
-    ARENA_TEAM_CHARTER_3v3_TYPE = 3,
-    ARENA_TEAM_CHARTER_5v5_TYPE = 5
+    GUILD_CHARTER_TYPE                            = 9,
+    ARENA_TEAM_CHARTER_2v2_TYPE                   = 2,
+    ARENA_TEAM_CHARTER_3v3_TYPE                   = 3,
+    ARENA_TEAM_CHARTER_5v5_TYPE                   = 5
 };
 
 //class to deal with packet processing
@@ -124,7 +126,7 @@ public:
     virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    [[nodiscard]] virtual bool ProcessLogout() const { return true; }
+    [[nodiscard]] virtual bool ProcessUnsafe() const { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -138,7 +140,7 @@ public:
 
     bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
-    [[nodiscard]] bool ProcessLogout() const override { return false; }
+    [[nodiscard]] bool ProcessUnsafe() const override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -161,7 +163,7 @@ class CharacterCreateInfo
 
 protected:
     CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
+                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
         OutfitId(outfitId), Data(data), CharCount(0)
     {}
 
@@ -358,7 +360,6 @@ public:
 
     uint32 GetLatency() const { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }
-    void ResetClientTimeDelay() { m_clientTimeDelay = 0; }
 
     std::atomic<time_t> m_timeOutTime;
     void UpdateTimeOutTime(uint32 diff)
@@ -388,6 +389,9 @@ public:
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
+    // Time Synchronisation
+    void ResetTimeSync();
+    void SendTimeSync();
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& recvPacket);          // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
@@ -726,7 +730,7 @@ public:                                                 // opcodes handlers
 
     void HandlePageTextQueryOpcode(WorldPacket& recvPacket);
 
-    void HandleTutorialFlag(WorldPacket& recvData);
+    void HandleTutorialFlag (WorldPacket& recvData);
     void HandleTutorialClear(WorldPacket& recvData);
     void HandleTutorialReset(WorldPacket& recvData);
 
@@ -1029,7 +1033,6 @@ private:
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
     uint32 m_latency;
-    uint32 m_clientTimeDelay;
     AccountData m_accountData[NUM_ACCOUNT_DATA_TYPES];
     uint32 m_Tutorials[MAX_ACCOUNT_TUTORIAL_VALUES];
     bool   m_TutorialsChanged;
@@ -1045,6 +1048,14 @@ private:
     bool _shouldSetOfflineInDB;
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
+
+    CircularBuffer<std::pair<int64, uint32>> _timeSyncClockDeltaQueue; // first member: clockDelta. Second member: latency of the packet exchange that was used to compute that clockDelta.
+    int64 _timeSyncClockDelta;
+    void ComputeNewClockDelta();
+
+    std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
+    uint32 _timeSyncNextCounter;
+    uint32 _timeSyncTimer;
 };
 #endif
 /// @}

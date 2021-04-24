@@ -37,7 +37,7 @@ namespace
         _configOptions.emplace(optionName, optionKey);
     }
 
-    void  ParseFile(std::string const& file)
+    void ParseFile(std::string const& file)
     {
         std::ifstream in(file);
 
