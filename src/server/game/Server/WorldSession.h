@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/// \addtogroup u2w
-/// @{
-/// \file
+ /// \addtogroup u2w
+ /// @{
+ /// \file
 
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
@@ -61,14 +61,14 @@ namespace lfg
 
 enum AccountDataType
 {
-    GLOBAL_CONFIG_CACHE             = 0,                    // 0x01 g
-    PER_CHARACTER_CONFIG_CACHE      = 1,                    // 0x02 p
-    GLOBAL_BINDINGS_CACHE           = 2,                    // 0x04 g
-    PER_CHARACTER_BINDINGS_CACHE    = 3,                    // 0x08 p
-    GLOBAL_MACROS_CACHE             = 4,                    // 0x10 g
-    PER_CHARACTER_MACROS_CACHE      = 5,                    // 0x20 p
-    PER_CHARACTER_LAYOUT_CACHE      = 6,                    // 0x40 p
-    PER_CHARACTER_CHAT_CACHE        = 7,                    // 0x80 p
+    GLOBAL_CONFIG_CACHE = 0,                    // 0x01 g
+    PER_CHARACTER_CONFIG_CACHE = 1,                    // 0x02 p
+    GLOBAL_BINDINGS_CACHE = 2,                    // 0x04 g
+    PER_CHARACTER_BINDINGS_CACHE = 3,                    // 0x08 p
+    GLOBAL_MACROS_CACHE = 4,                    // 0x10 g
+    PER_CHARACTER_MACROS_CACHE = 5,                    // 0x20 p
+    PER_CHARACTER_LAYOUT_CACHE = 6,                    // 0x40 p
+    PER_CHARACTER_CHAT_CACHE = 7,                    // 0x80 p
 };
 
 #define NUM_ACCOUNT_DATA_TYPES        8
@@ -78,9 +78,9 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() :  Data("") {}
+    AccountData() : Data("") {}
 
-    time_t Time{0};
+    time_t Time{ 0 };
     std::string Data;
 };
 
@@ -94,27 +94,27 @@ enum PartyOperation
 
 enum BFLeaveReason
 {
-    BF_LEAVE_REASON_CLOSE     = 0x00000001,
+    BF_LEAVE_REASON_CLOSE = 0x00000001,
     //BF_LEAVE_REASON_UNK1      = 0x00000002, (not used)
     //BF_LEAVE_REASON_UNK2      = 0x00000004, (not used)
-    BF_LEAVE_REASON_EXITED    = 0x00000008,
+    BF_LEAVE_REASON_EXITED = 0x00000008,
     BF_LEAVE_REASON_LOW_LEVEL = 0x00000010,
 };
 
 enum ChatRestrictionType
 {
     ERR_CHAT_RESTRICTED = 0,
-    ERR_CHAT_THROTTLED  = 1,
-    ERR_USER_SQUELCHED  = 2,
+    ERR_CHAT_THROTTLED = 1,
+    ERR_USER_SQUELCHED = 2,
     ERR_YELL_RESTRICTED = 3
 };
 
 enum CharterTypes
 {
-    GUILD_CHARTER_TYPE                            = 9,
-    ARENA_TEAM_CHARTER_2v2_TYPE                   = 2,
-    ARENA_TEAM_CHARTER_3v3_TYPE                   = 3,
-    ARENA_TEAM_CHARTER_5v5_TYPE                   = 5
+    GUILD_CHARTER_TYPE = 9,
+    ARENA_TEAM_CHARTER_2v2_TYPE = 2,
+    ARENA_TEAM_CHARTER_3v3_TYPE = 3,
+    ARENA_TEAM_CHARTER_5v5_TYPE = 5
 };
 
 //class to deal with packet processing
@@ -163,7 +163,7 @@ class CharacterCreateInfo
 
 protected:
     CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
+        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
         OutfitId(outfitId), Data(data), CharCount(0)
     {}
 
@@ -276,8 +276,8 @@ public:
 
     void SendTrainerList(ObjectGuid guid);
     void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
-    void SendTrainerList(uint64 guid, uint32 npcid);//pzx 自定义训练师
     void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
+    void SendTrainerList(uint64 guid, uint32 npcid);//pzx 自定义训练师
     void SendShowBank(ObjectGuid guid);
     bool CanOpenMailBox(ObjectGuid guid);
     void SendShowMailBox(ObjectGuid guid);
@@ -730,7 +730,7 @@ public:                                                 // opcodes handlers
 
     void HandlePageTextQueryOpcode(WorldPacket& recvPacket);
 
-    void HandleTutorialFlag (WorldPacket& recvData);
+    void HandleTutorialFlag(WorldPacket& recvData);
     void HandleTutorialClear(WorldPacket& recvData);
     void HandleTutorialReset(WorldPacket& recvData);
 
@@ -1029,7 +1029,6 @@ private:
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer
     bool m_playerLogout;                                // code processed in LogoutPlayer
-    uint32 m_clientTimeDelay;
     bool m_playerSave;
     LocaleConstant m_sessionDbcLocale;
     LocaleConstant m_sessionDbLocaleIndex;
