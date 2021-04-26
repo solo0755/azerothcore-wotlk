@@ -162,7 +162,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     // Save player's arena team membership to db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->setUInt32(0, TeamId);
-    stmt->setUInt32(1, GUID_LOPART(playerGuid));
+    stmt->setUInt32(1, playerGuid.GetCounter());
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
