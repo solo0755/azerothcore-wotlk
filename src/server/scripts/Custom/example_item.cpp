@@ -1,4 +1,4 @@
-﻿/*
+/*
     MIT License
 
     Copyright (c) 2018 José González
@@ -29,6 +29,7 @@
 #include "Pet.h"
 #include "Chat.h"
 #include "Player.h"
+#include "Object.h"
 #include "common_example.h"
 #include "ScriptedGossip.h"
 #include  "Log.h"
@@ -181,7 +182,7 @@ public:
 			break;
 		}
 		uint32 accID = player->GetSession()->GetAccountId();
-		uint32 guid = player->GetGUIDLow();
+		uint32 guid = player->GetGUID().GetCounter();
 		uint64 oldVel = sPzxMgr->getTimeLength(guid, action);
 
 		if (oldVel) {
@@ -345,7 +346,7 @@ public:
 			if (mypoint >= needval) {//点数足够
 				Item* item = player->StoreNewItem(dest, items, true);
 				if (sPzxMgr->cutPoints(needval, accID)) {
-					sLog->outString( "Account %u guid %u : getitem from zz %u", accID, player->GetGUIDLow(), items);
+					sLog->outString( "Account %u guid %u : getitem from zz %u", accID, player->GetGUID().GetCounter(), items);
 					PSendSysMessage(player, u8"[系统消息]:系统扣减[|cffff0000%d|h|r]后剩余[|cff00ff00%d|h|r]赞助点", needval, sPzxMgr->getMyPoint(accID));
 					player->SendNewItem(item, 1, true, false);
 
@@ -441,7 +442,7 @@ public:
 			MenuTree _tree = sPzxMgr->getTreeByID(i_id);
 			uint32 ty = _tree.type;
 			if (ty == 3) {
-				uint64 dbtime = sPzxMgr->getTimeLength(player->GetGUIDLow(), i_id);
+				uint64 dbtime = sPzxMgr->getTimeLength(player->GetGUID().GetCounter(), i_id);
 				uint32 dist;
 				if ((_tree.itemid + dbtime) < time(nullptr)) {//超期了
 					dist = 0;
@@ -474,9 +475,9 @@ public:
 				return "";//没有物品返回
 
 						  //查看数据库中是否有记录的时长
-			uint64 timeDur = sPzxMgr->getTimeLength(player->GetGUIDLow(), item_id);
+			uint64 timeDur = sPzxMgr->getTimeLength(player->GetGUID().GetCounter(), item_id);
 			if (timeDur == 0) {//没有插入数据的
-				sPzxMgr->updateTime(item_id, player->GetGUIDLow(), accID, uint64(time(nullptr)));//更新当前时间
+				sPzxMgr->updateTime(item_id, player->GetGUID().GetCounter(), accID, uint64(time(nullptr)));//更新当前时间
 				timeDur = 60 * 60 * 24 * 30;//默认30天
 			}
 			else {//有数据
@@ -485,7 +486,7 @@ public:
 				if (leftLen <= 0) {
 					//摧毁物品，
 					player->DestroyItemCount(item_id, 1, true);
-					sLog->outString(u8"GUID %d 过期自动摧毁%d", player->GetGUIDLow(), item_id);
+					sLog->outString(u8"GUID %d 过期自动摧毁%d", player->GetGUID().GetCounter(), item_id);
 					PSendSysMessage(player, u8"您的团长工具已经过期,请重新购买");
 					name = u8"您的团长工具道具已经过期,请重新购买";
 				}
@@ -507,7 +508,7 @@ public:
 
 	void showMenu(Player * player, Item * item) {
 		ClearGossipMenuFor(player);
-		uint32 guid = player->GetGUIDLow();
+		uint32 guid = player->GetGUID().GetCounter();
 		CharaMenuMap mmap = sPzxMgr->treeMenu;
 		CharaMenuMap::iterator it;
 		for (it = mmap.begin(); it != mmap.end(); it++) {

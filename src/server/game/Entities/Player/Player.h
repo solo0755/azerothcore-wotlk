@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -650,9 +650,9 @@ struct EquipmentSet
     uint64 Guid;
     std::string Name;
     std::string IconName;
-    uint32 IgnoreMask{0};
+    uint32 IgnoreMask{ 0 };
     ObjectGuid Items[EQUIPMENT_SLOT_END];
-    EquipmentSetUpdateState state{EQUIPMENT_SET_NEW};
+    EquipmentSetUpdateState state{ EQUIPMENT_SET_NEW };
 };
 
 #define MAX_EQUIPMENT_SET_INDEX 10                          // client limit
@@ -759,38 +759,38 @@ enum PlayedTimeIndex
 // used at player loading query list preparing, and later result selection
 enum PlayerLoginQueryIndex
 {
-    PLAYER_LOGIN_QUERY_LOAD_FROM                    = 0,
-    PLAYER_LOGIN_QUERY_LOAD_AURAS                   = 3,
-    PLAYER_LOGIN_QUERY_LOAD_SPELLS                  = 4,
-    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS            = 5,
-    PLAYER_LOGIN_QUERY_LOAD_DAILY_QUEST_STATUS      = 6,
-    PLAYER_LOGIN_QUERY_LOAD_REPUTATION              = 7,
-    PLAYER_LOGIN_QUERY_LOAD_INVENTORY               = 8,
-    PLAYER_LOGIN_QUERY_LOAD_ACTIONS                 = 9,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT              = 10,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT       = 11,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE               = 12,
-    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 13,
-    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 14,
-    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 15,
-    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES          = 16,
-    PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS            = 18,
-    PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS       = 19,
-    PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS          = 20,
-    PLAYER_LOGIN_QUERY_LOAD_ENTRY_POINT             = 21,
-    PLAYER_LOGIN_QUERY_LOAD_GLYPHS                  = 22,
-    PLAYER_LOGIN_QUERY_LOAD_TALENTS                 = 23,
-    PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA            = 24,
-    PLAYER_LOGIN_QUERY_LOAD_SKILLS                  = 25,
-    PLAYER_LOGIN_QUERY_LOAD_WEEKLY_QUEST_STATUS     = 26,
-    PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG               = 27,
-    PLAYER_LOGIN_QUERY_LOAD_BANNED                  = 28,
-    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_REW        = 29,
-    PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES     = 30,
-    PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
-    PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
-    PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
-    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    PLAYER_LOGIN_QUERY_LOAD_FROM = 0,
+    PLAYER_LOGIN_QUERY_LOAD_AURAS = 3,
+    PLAYER_LOGIN_QUERY_LOAD_SPELLS = 4,
+    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS = 5,
+    PLAYER_LOGIN_QUERY_LOAD_DAILY_QUEST_STATUS = 6,
+    PLAYER_LOGIN_QUERY_LOAD_REPUTATION = 7,
+    PLAYER_LOGIN_QUERY_LOAD_INVENTORY = 8,
+    PLAYER_LOGIN_QUERY_LOAD_ACTIONS = 9,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT = 10,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT = 11,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_DATE = 12,
+    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST = 13,
+    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND = 14,
+    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS = 15,
+    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES = 16,
+    PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS = 18,
+    PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS = 19,
+    PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS = 20,
+    PLAYER_LOGIN_QUERY_LOAD_ENTRY_POINT = 21,
+    PLAYER_LOGIN_QUERY_LOAD_GLYPHS = 22,
+    PLAYER_LOGIN_QUERY_LOAD_TALENTS = 23,
+    PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA = 24,
+    PLAYER_LOGIN_QUERY_LOAD_SKILLS = 25,
+    PLAYER_LOGIN_QUERY_LOAD_WEEKLY_QUEST_STATUS = 26,
+    PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG = 27,
+    PLAYER_LOGIN_QUERY_LOAD_BANNED = 28,
+    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_REW = 29,
+    PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES = 30,
+    PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS = 31,
+    PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS = 32,
+    PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH = 34,
+    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION = 35,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -984,8 +984,8 @@ struct BGData
     bool bgIsRandom{ false };
 
     GuidSet            bgAfkReporter;
-    uint8              bgAfkReportedCount{0};
-    time_t             bgAfkReportedTimer{0};
+    uint8              bgAfkReportedCount{ 0 };
+    time_t             bgAfkReportedTimer{ 0 };
 };
 
 // holder for Entry Point data (pussywizard: stored in db)
@@ -1007,7 +1007,7 @@ struct EntryPointData
 class TradeData
 {
 public:                                                 // constructors
-    TradeData(Player* player, Player* trader) : m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0)
+    TradeData(Player* player, Player* trader) : m_player(player), m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0)
     {
     }
 
@@ -1022,7 +1022,7 @@ public:                                                 // constructors
     [[nodiscard]] uint32 GetSpell() const { return m_spell; }
     void SetSpell(uint32 spell_id, Item* castItem = nullptr);
 
-    [[nodiscard]] Item*  GetSpellCastItem() const;
+    [[nodiscard]] Item* GetSpellCastItem() const;
     [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
 
     [[nodiscard]] uint32 GetMoney() const { return m_money; }
@@ -2510,14 +2510,7 @@ public:
     // Set map to player and add reference
     void SetMap(Map* map) override;
     void ResetMap() override;
-    /*********************************************************/
-    /***                   PZX SYSTEM                    ***/
-    /*********************************************************/
-    uint32 m_trainerid;
-    void SetTrainerEntry(const uint32 id) { m_trainerid = id; }
-    uint32 GetTrainerEntry()const { return m_trainerid; }
-    //int doVipItemUP();
-    //void setVipItemUPInfo(ItemUpData data) { m_itemUpData = data; }//VIP������Ʒ����
+
     bool isAllowedToLoot(const Creature* creature);
 
     [[nodiscard]] DeclinedName const* GetDeclinedNames() const { return m_declinedname; }
